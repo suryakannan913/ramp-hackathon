@@ -1,0 +1,55 @@
+From: Sarah Chen <sarah@northstar-supp1y.com>
+To: ap@example.com
+Reply-To: finance@northstar-payments.com
+Subject: RE: NS-1042 / Updated remittance instructions — urgent
+Message-ID: <attack@bankguard.demo>
+Authentication-Results: demo.fixture; spf=fail; dkim=fail; dmarc=fail
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="bankguard-demo-boundary"
+
+--bankguard-demo-boundary
+Content-Type: text/plain; charset=utf-8
+
+Hi AP team,
+
+We have switched banks. Please update our payment details immediately before the $48,000 invoice is paid today. Our CFO has asked that this remain confidential; do not call the office because we are migrating phone systems. Use the new details in the attached bank letter.
+
+Bank: Atlantic Commercial Bank
+Account ending: 9017
+Routing: 021000021
+Country: GB
+
+Best,
+Sarah Chen
+--bankguard-demo-boundary
+Content-Type: application/pdf; name="bank-confirmation.pdf"
+Content-Disposition: attachment; filename="bank-confirmation.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjcKJYGBgYEKCjcgMCBvYmoKPDwKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL0xlbmd0aCA1
+MjEKPj4Kc3RyZWFtCnictZTfitVADMbv+xRzLeyaZPJnAiJ4zunBC2+EvoDoKsqKrIjP7zft6bLi
+qdQLKR2maZv8knyZh+EwDXTLUuhWtC9Wvn8anr++u/959+Pz+3c3h2/3H26CsmmjaFk4y/RxwLfT
+m4EL4eJiVkKoTF+HFzr6OSTUW1SsHCKk6aNrWLeEeDr7UcgqLBTkx8iXZfoyTM+GcRreDg8z0+z6
+CkqGijcxbwXU11DcbUERZR31AADWiutspqMpnrHHG9c00ZOyqWa37MMQImpk2bwwXye4FAMpIvVe
+DDes6VXI1c+O1P3k1t/B4r1kQst3oBMUaPSDnLTC0vcx2wN/oaCus5fu4Sw7mTOMAIAgW8yWMjPv
+84fWidWOt+nP9dKFnidu7/n35kMeWV8hn/8olaZG3Ij/km/1lW+u9kzE4Dj257Vb6MAZdUavQFNX
+nvWfnSwOrQS3aJss1BYWRgxEjFUZvXKdBArofDUrVa6xL641UXepdTMuRnrRqfSY8TQSVUEkulzY
+74vJOCYwUxy2GdMWneljno96QMo71ddaS2byuhlF9B/UnADAESC55a7mIhaDBL0PYe0DGT7LIt0D
+k+VPhjUgnQjPLm7sci6v9IZGg7WupV58zE2ej4De/Fl8EAKqcW24bw2nNF+WK+ejBDXOTMNk0p/J
+YC6K8dp2NeuHYFWcgL/F+gXKdlY4CmVuZHN0cmVhbQplbmRvYmoKCjggMCBvYmoKPDwKL0ZpbHRl
+ciAvRmxhdGVEZWNvZGUKL1R5cGUgL09ialN0bQovTiA2Ci9GaXJzdCAzMgovTGVuZ3RoIDUyMAo+
+PgpzdHJlYW0KeJydVNtq20AQfddXzGP7EPaivRZjiG8tlNCQBFpa+qBIi1Ex2iKtS/r3nVlJbWK7
+UGqzSDtn5syZ3dEI4CBBKSjBOlCgLAcNWkswYEoPi0XBHn5+D8Buq30YCva+bQb4giiHO/hasHU8
+dglEsVwWf3zXVaoOcV+MQSDIefa47WNzrEMPi912t+Pccs6NwmU4lxt8rnF5XHJZsJvYbKoU4NXm
+jeTSCMEFz7/PrzF1H6oUfxMpiUEImy2u1UimSnx3z+yYzWjEkAJL5VaPmJWjCLKTEBJgMc6q0Sfj
+U9zMkflmTIy+hgoi4VlbG7u/q39o0yHM2jXqtH7kzDxu4lbTYZRT7tMa+YhR3mybtZPf5pkuP/ss
+X97ULnapYPfHx5S3ZBQFW1VDIATYu3D4EVJbVwXbdnVs2m4P7GPbXXdDOxv+k/FqFQ/NP9NSJ1E/
+9YHaLTcUuwtDPPY1dhj5ZXp6eZnhynLvlMPr9NjZOe7EwVsljZPauHMHOmDHtXcGP44TzGNnKOMl
+t+eY1VbqsjSX4pzSXDjshQtxzmAuK1z+GE8w7aQyRpblBUxgiVoqYfUFLc45j81nyks1+FIpL/05
+lM9GWu6E916b6WzwUtinD4/fQp0Pm7bbp/T2PlGjjway3YSmrVbxCUcFx78REqyXNDCuuy4mGiF5
+eHQJ75N2dhooGPwLe8gq7QplbmRzdHJlYW0KZW5kb2JqCgo5IDAgb2JqCjw8Ci9TaXplIDEwCi9S
+b290IDIgMCBSCi9JbmZvIDMgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCi9UeXBlIC9YUmVmCi9M
+ZW5ndGggNDMKL1cgWyAxIDIgMiBdCi9JbmRleCBbIDAgMTAgXQo+PgpzdHJlYW0KeJwVybENADAI
+BLGDECklM2ZiNgK+cWOg23kgTLg4IsQ1kp2/RMEAa/cDlQplbmRzdHJlYW0KZW5kb2JqCgpzdGFy
+dHhyZWYKMTIzMgolJUVPRg==
+--bankguard-demo-boundary--

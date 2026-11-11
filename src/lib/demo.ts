@@ -13,6 +13,7 @@ export async function demoEmail(key:string) {
   const lines=['Synthetic document for the Bank-Change Guard demo.','',`Beneficiary: ${vendor.name}`,`Bank: ${fixture.bank}`,`Account ending: ${fixture.last4}`,`Routing: ${fixture.routing}`,`Country: ${fixture.country}`,'','Please verify changes with your existing vendor contact.'];
   lines.forEach((text,i)=>page.drawText(text,{x:55,y:620-i*28,size:11,font}));
   if(key==='attack') page.drawText('REVISED',{x:450,y:510,size:10,font:bold,color:rgb(.5,.15,.15)});
+  pdf.setCreationDate(new Date('2026-11-01T00:00:00Z'));pdf.setModificationDate(new Date('2026-11-01T00:00:00Z'));
   pdf.setTitle('Synthetic bank confirmation');pdf.setCreator('Bank-Change Guard fixture generator');pdf.setProducer('pdf-lib');
   const attachment=Buffer.from(await pdf.save()).toString('base64').match(/.{1,76}/g)!.join('\r\n');
   const boundary='bankguard-demo-boundary';

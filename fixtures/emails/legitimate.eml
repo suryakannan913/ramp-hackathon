@@ -1,0 +1,54 @@
+From: Alex Rivera <alex@cedarcreative.com>
+To: ap@example.com
+Reply-To: alex@cedarcreative.com
+Subject: Bank details update for next month
+Message-ID: <legitimate@bankguard.demo>
+Authentication-Results: demo.fixture; spf=pass; dkim=pass; dmarc=pass
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="bankguard-demo-boundary"
+
+--bankguard-demo-boundary
+Content-Type: text/plain; charset=utf-8
+
+Hello team,
+
+Thank you for the partnership. Our studio is moving to a new business checking account next month. Please follow your usual verification process and call our existing office number with questions. The bank confirmation is attached.
+
+Bank: Chase
+Account ending: 7812
+Routing: 021000021
+Country: US
+
+Regards,
+Alex
+--bankguard-demo-boundary
+Content-Type: application/pdf; name="bank-confirmation.pdf"
+Content-Disposition: attachment; filename="bank-confirmation.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjcKJYGBgYEKCjcgMCBvYmoKPDwKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL0xlbmd0aCA0
+NjMKPj4Kc3RyZWFtCnicrVNdi9RAEHzPr5hn4c7+7hmQA9fd4IMvQv6A6CkeJ3Ii/n5rJrtwwkYi
+yJAwmQldVd1VT9NhmeiWpdCtWH95+fFlevn2/vHX/c+vHz/cHL4/frpJatUqZW2FW1k+T/h3eTdx
+ISwu7iWFyvJtemUaHhacImSagi9Oi5YRLuSalv2+xXxXlodpeTGdlun99DR4jHJX4FuaRBWPWsD0
+Gjyqr/BibCc7AJxNsWZ3O7l1MjbjJqy52NHYzVo/2UdDiKiStxqF+TqDcwMgscUJkmt4Fx4qBMFz
+KIQf0Q7c4SRi7i1a/wM7CY5THOSIBtaxz3Ge2RsoYaNKrzDLTs4tnUAAIFucvcngvK9eeoprp7dZ
+L+w8ha4TT3T9eKAgm77uU/i/9qjmxJX4Lxo1LpxGh88s0OMEl50ogckn16ybKFRXFIZexWwvc+59
+6Howz46sqVVZZR+uV7EIUd3ERShX10nHzOdIpAIkOi/s92Eygo6EcPompssl6medl+m6u+70Uq21
+MVPoJorYP3izgQACLW2rnLbVBk7xZphOu+G67WDCFpHISTyLXiK2mTAmAopdG+2VPtCsONVLq9ca
+Y8gj0H34I/4wAgzwZ1R/A9S4MHAKZW5kc3RyZWFtCmVuZG9iagoKOCAwIG9iago8PAovRmlsdGVy
+IC9GbGF0ZURlY29kZQovVHlwZSAvT2JqU3RtCi9OIDYKL0ZpcnN0IDMyCi9MZW5ndGggNTA5Cj4+
+CnN0cmVhbQp4nJ1U22rcMBB991fMY/sQdLGuZVnI3loooSEJNLT0wbHF4rJYxdaW9O87I9ttstlC
+yS7C1pyZM2ek8QjgIEEpKME6UKAsBw1aSzBgSg+LRcHufv0IwK6rfRgK9rFtBviKKIcb+FawdTx2
+CUSxXBZ/fddVqg5xX4xBIMh59rjuY3OsQw+L3Xa349xyzo3CZTiXG3yucXlcclmwq9hsqhTgzead
+5NIIwQXPvy9vMXUfqhT/ECmJQQibLa7VSKZKfHdP7JjNaMSQAkvlVo+YlaMIspMQEmAxzqrRJ+NT
+3MyR+WZMjL6GCiLhWVsbu3+rv2vTIczaNeq0fuTMPG7iVtNhlFPu0xr5iFHebJu1k9/miS4/+yyf
+39Qudqlgt8eHlLdkFAVbVUMgBNiHcPgZUltXBdt2dWzabg/sc9tddkM7G17JeLGKh+a/aamTqJ/6
+QO2WG4rdhCEe+xo7jPwyPb08z3BhuXfK4XV67Owcd+LgrZLGSW3cSwc6YMe1dwY/jhPMY2co4yW3
+LzGrrdRlac7FOaW5cNgLZ+KcwVxWuPwxnmDaSWWMLMszmMAStVTC6jNanHMem8+U52rwpVJe+gnC
+M2f3nx6+hzqfJW23j+n9baI+Hg1kuwpNW63iI04Cjn8jJFgvaR5cdl1MNCHybOgSXhft7DQvMPg3
+VesiFQplbmRzdHJlYW0KZW5kb2JqCgo5IDAgb2JqCjw8Ci9TaXplIDEwCi9Sb290IDIgMCBSCi9J
+bmZvIDMgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCi9UeXBlIC9YUmVmCi9MZW5ndGggNDMKL1cg
+WyAxIDIgMiBdCi9JbmRleCBbIDAgMTAgXQo+PgpzdHJlYW0KeJwVybENADAIBLGDECklY2RXhga+
+cWOg23kgTLg4IsQ1kp2/RMEAaVgDFgplbmRzdHJlYW0KZW5kb2JqCgpzdGFydHhyZWYKMTE2Mwol
+JUVPRg==
+--bankguard-demo-boundary--

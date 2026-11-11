@@ -1,0 +1,54 @@
+From: Morgan Lee <morgan@harborlogistics.com>
+To: ap@example.com
+Reply-To: morgan@harborlogistics.com
+Subject: Remittance details for November
+Message-ID: <ambiguous@bankguard.demo>
+Authentication-Results: demo.fixture; spf=pass; dkim=pass
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="bankguard-demo-boundary"
+
+--bankguard-demo-boundary
+Content-Type: text/plain; charset=utf-8
+
+Good morning,
+
+Please use the new account for our next shipment payment. We have expanded our banking arrangements. The confirmation letter is attached. Please call our office with questions.
+
+Bank: Pacific Business Bank
+Account ending: 5520
+Routing: 121000248
+Country: CA
+
+Thanks,
+Morgan
+--bankguard-demo-boundary
+Content-Type: application/pdf; name="bank-confirmation.pdf"
+Content-Disposition: attachment; filename="bank-confirmation.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjcKJYGBgYEKCjcgMCBvYmoKPDwKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL0xlbmd0aCA0
+NzMKPj4Kc3RyZWFtCnicrVRdixQxEHzPr8izcGe60x8JHIJ7u4sPvgjzB0TvxONETsTfb3Vyuyrs
+yAgSZslkZruquqvmKe2WVK6Jc7lmiR/N3z6ll2/uHn/cff/84f3V7uvjxysvvUkr3nqmnpf7hHeX
+t4lywaKsmp1LXr6kG2lGzsZ2dOYit3Y0t+7VxbpVr6/y8pCWF+mwpHfpaaCPIhdAuwtbY7WWwe8S
+qJlOUBaSg+wASFKxjqpyUME99nhi0pVlL6QiPU620eBSSivam2WiywyeZWv1bgeIbKZTKhcTiK+u
+tjeNZzix2Zb5HtixkR1sx3upOIm9j3PHv6KNMqpEhSNv5NxdCwgAZI2zdh6ct9VzddYa9FbrmTxP
+IXTistCPCwq819fQ819M0UQLtUJ/UVbtxGT0NbC1YB9sbE5FGIriHkzBoP6awkYWBj84NW+rLEqb
+LAK3QvNp+tEdGcgezKpicS3bcLWxmHGtq7gI6PRi9Hm68IREwKFaxmIEpG3DJIQeuSHXVUydXpKz
+zvPMq9BGh7XWOlGxuorC8g+O7SCAmHNfK1f7tAmscWsRtBqhc3xNYFIYxZEe+y2QYRIPwyK22PXR
+Xo6BejvbGG/OGmPIw+gx/PFRgBFggD8D/BPhIzNiCmVuZHN0cmVhbQplbmRvYmoKCjggMCBvYmoK
+PDwKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL1R5cGUgL09ialN0bQovTiA2Ci9GaXJzdCAzMgovTGVu
+Z3RoIDUwOQo+PgpzdHJlYW0KeJydVNtq3DAQffdXzGP7EHSxrmVZyN5aKKEhCTS09MGxxeKyWMXW
+lvTvOyPbbbLZQskuwtacmTNnpPEI4CBBKSjBOlCgLAcNWkswYEoPi0XB7n79CMCuq30YCvaxbQb4
+iiiHG/hWsHU8dglEsVwWf33XVaoOcV+MQSDIefa47mNzrEMPi912t+Pccs6NwmU4lxt8rnF5XHJZ
+sKvYbKoU4M3mneTSCMEFz78vbzF1H6oU/xApiUEImy2u1UimSnx3T+yYzWjEkAJL5VaPmJWjCLKT
+EBJgMc6q0SfjU9zMkflmTIy+hgoi4VlbG7t/q79r0yHM2jXqtH7kzDxu4lbTYZRT7tMa+YhR3myb
+tZPf5okuP/ssn9/ULnapYLfHh5S3ZBQFW1VDIATYh3D4GVJbVwXbdnVs2m4P7HPbXXZDOxteyXix
+iofmv2mpk6if+kDtlhuK3YQhHvsaO4z8Mj29PM9wYbl3yuF1euzsHHfi4K2Sxklt3EsHOmDHtXcG
+P44TzGNnKOMlty8xq63UZWnOxTmluXDYC2finMFcVrj8MZ5g2klljCzLM5jAErVUwuozWpxzHpvP
+lOdq8KVSXvoJwjNn958evoc6nyVtt4/p/W2iPh4NZLsKTVut4iNOAo5/IyRYL2keXHZdTDQh8mzo
+El4X7ew0LzD4N1XrIhUKZW5kc3RyZWFtCmVuZG9iagoKOSAwIG9iago8PAovU2l6ZSAxMAovUm9v
+dCAyIDAgUgovSW5mbyAzIDAgUgovRmlsdGVyIC9GbGF0ZURlY29kZQovVHlwZSAvWFJlZgovTGVu
+Z3RoIDQzCi9XIFsgMSAyIDIgXQovSW5kZXggWyAwIDEwIF0KPj4Kc3RyZWFtCnicFcmxDQAwCASx
+gxApJbNkV+YFvnFjoNt5IEy4OCLENZKdv0TBAGnGAyoKZW5kc3RyZWFtCmVuZG9iagoKc3RhcnR4
+cmVmCjExNzMKJSVFT0Y=
+--bankguard-demo-boundary--

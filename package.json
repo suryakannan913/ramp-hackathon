@@ -10,7 +10,9 @@
     "test": "tsx --test tests/*.test.ts",
     "evaluate": "tsx scripts/evaluate.ts",
     "db:setup": "prisma migrate deploy && tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "fixtures": "tsx scripts/export-fixtures.ts",
+    "vendor:add": "tsx scripts/setup-vendor.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",

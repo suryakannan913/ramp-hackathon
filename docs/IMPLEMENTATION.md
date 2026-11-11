@@ -8,7 +8,7 @@
 5. Verification: workflow tests, synthetic evaluation, production build and demo guide.
 
 ## Integration boundary
-No credentials were provided at setup. Demo mode works entirely locally. Ramp vendor/bill reads are optional; hold mutations must not be fabricated. The public API reference and OpenAPI schema must establish a supported hold operation before implementing live holds. Until then all local holds are explicitly simulated. Callbacks are simulated and human approvals do not mutate Ramp bank details.
+No credentials were provided at setup. Demo mode works entirely locally. Ramp vendor/bill reads are optional; hold mutations must not be fabricated. The public OpenAPI schema documents POST /bills/{bill_id}/hold and /release with bills:write scope. A sandbox adapter validates ON_HOLD responses. Demo bills always remain explicitly simulated. Sandbox credentials and account feature access have not been tested. Callbacks are simulated and human approvals do not mutate Ramp bank details.
 
 Sources checked: https://docs.ramp.com/llms-api.txt, https://support.ramp.com/hold-payment-for-bills-and-vendors/, https://developers.openai.com/api/docs/guides/structured-outputs, https://developers.openai.com/api/docs/guides/file-inputs.
 
