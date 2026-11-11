@@ -584,15 +584,23 @@ export default function Home() {
                             {detail.assessment.conflicts && (
                               <ConflictAlert fields={detail.assessment.conflicts} />
                             )}
-                            <div className="section-title">
-                              <h3>Investigation stages</h3>
-                              <span>Pipeline status</span>
-                            </div>
-                            <div className="flex flex-wrap mb-6">
-                              {detail.assessment.stages && Object.entries(detail.assessment.stages).map(([stage, status]) => (
-                                <AnalysisStageBadge key={stage} stage={stage} status={status} />
-                              ))}
-                            </div>
+                            <details className="fold">
+                              <summary>
+                                Investigation stages <span>Pipeline status</span>
+                              </summary>
+                              <div className="fold-body flex flex-wrap">
+                                {detail.assessment.stages &&
+                                  Object.entries(detail.assessment.stages).map(
+                                    ([stage, status]) => (
+                                      <AnalysisStageBadge
+                                        key={stage}
+                                        stage={stage}
+                                        status={status}
+                                      />
+                                    ),
+                                  )}
+                              </div>
+                            </details>
 
                             <div className="section-title">
                               <h3>What changed</h3>
@@ -630,12 +638,17 @@ export default function Home() {
                               </div>
                             </div>
                             {detail.assessment.provenance && (
-                              <div className="provenance-card mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                                <div className="flex items-center gap-2 mb-2 text-blue-800 font-semibold">
-                                  <ShieldCheck size={18} />
-                                  <span>Email Provenance</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
+                              <details className="fold">
+                                <summary>
+                                  Email provenance
+                                  <span>
+                                    DKIM{" "}
+                                    {detail.assessment.provenance.authStatus.dkim.toUpperCase()}{" "}
+                                    · SPF{" "}
+                                    {detail.assessment.provenance.authStatus.spf.toUpperCase()}
+                                  </span>
+                                </summary>
+                                <div className="fold-body grid grid-cols-2 gap-3">
                                   <div>
                                     <span className="text-gray-500">DKIM:</span>{" "}
                                     <span className={detail.assessment.provenance.authStatus.dkim === "pass" ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
@@ -661,7 +674,7 @@ export default function Home() {
                                     </span>
                                   </div>
                                 </div>
-                              </div>
+                              </details>
                             )}
                             <div className="section-title">
                               <h3>Evidence breakdown</h3>
@@ -674,20 +687,29 @@ export default function Home() {
                                 <EvidenceCard key={e.id} evidence={e} />
                               ))}
                             </div>
-                            <div className="coverage">
-                              <strong>Analysis coverage</strong>
-                              <p>{detail.assessment.aiStatus}</p>
-                              {detail.assessment.missing.length > 0 && (
-                                <p>
-                                  Needs review:{" "}
-                                  {detail.assessment.missing.join(" · ")}
-                                </p>
-                              )}
-                              <small>
-                                Risk points express policy severity, not the
-                                probability of fraud.
-                              </small>
-                            </div>
+                            <details className="fold">
+                              <summary>
+                                Analysis coverage
+                                {detail.assessment.missing.length > 0 && (
+                                  <span>
+                                    {detail.assessment.missing.length} need review
+                                  </span>
+                                )}
+                              </summary>
+                              <div className="fold-body">
+                                <p>{detail.assessment.aiStatus}</p>
+                                {detail.assessment.missing.length > 0 && (
+                                  <p>
+                                    Needs review:{" "}
+                                    {detail.assessment.missing.join(" · ")}
+                                  </p>
+                                )}
+                                <small>
+                                  Risk points express policy severity, not the
+                                  probability of fraud.
+                                </small>
+                              </div>
+                            </details>
                             <div className="section-title">
                               <h3>Affected bills</h3>
                               <span>Payment protection</span>
@@ -830,20 +852,17 @@ export default function Home() {
                                 Simulated callback
                               </span>
                             </div>
-                            <div className="coverage">
-                              <strong>
-                                Verify through a channel you already trust.
-                              </strong>
-                              <p>
-                                The callback uses the saved vendor phone number.
-                                Numbers from the email and bank letter are never
-                                used.
-                              </p>
-                              <small>
-                                The simulator saves a transcript without placing
-                                a call.
-                              </small>
-                            </div>
+                            <details className="fold">
+                              <summary>How verification works</summary>
+                              <div className="fold-body">
+                                <p>
+                                  The callback uses the saved vendor phone
+                                  number. Numbers from the email and bank letter
+                                  are never used. The simulator saves a
+                                  transcript without placing a call.
+                                </p>
+                              </div>
+                            </details>
                             {detail.callback &&
                             detail.callback.outcome !== "pending" ? (
                               <>
@@ -924,17 +943,21 @@ export default function Home() {
                                 </div>
                               </div>
                             )}
-                            <div className="section-title">
-                              <h3>Historical correspondence</h3>
-                              <span>Stored vendor baseline</span>
-                            </div>
-                            {(
-                              JSON.parse(detail.vendor.history) as string[]
-                            ).map((h, i) => (
-                              <blockquote className="history-message" key={i}>
-                                {h}
-                              </blockquote>
-                            ))}
+                            <details className="fold">
+                              <summary>
+                                Historical correspondence
+                                <span>Stored vendor baseline</span>
+                              </summary>
+                              <div className="fold-body">
+                                {(
+                                  JSON.parse(detail.vendor.history) as string[]
+                                ).map((h, i) => (
+                                  <blockquote className="history-message" key={i}>
+                                    {h}
+                                  </blockquote>
+                                ))}
+                              </div>
+                            </details>
                           </>
                         )}
                         {tab === "audit" && (
