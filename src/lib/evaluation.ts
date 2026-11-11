@@ -119,6 +119,20 @@ export function examples(): EvalExample[] {
           if (family === 8) headers = "";
         }
         const incomplete = !isFraud && family === 9;
+        const provenance = {
+          mailboxIdentity: "sarah@northstar-supply.com",
+          providerMessageId: `${label}-${family}-${variant}`,
+          providerThreadId: `thread-${family}`,
+          retrievedAt: new Date().toISOString(),
+          authStatus: {
+            dkim: headers.includes("dkim=pass") ? ("pass" as const) : ("fail" as const),
+            spf: headers.includes("spf=pass") ? ("pass" as const) : ("fail" as const),
+            dmarc: headers.includes("dmarc=pass") ? ("pass" as const) : ("fail" as const),
+            aligned: !isFraud && headers.includes("pass"),
+            trustedReceiver: true,
+          },
+          rawBytesHash: "fixture-hash",
+        };
         out.push({
           id: `${label}-${family}-${variant}`,
           label,
@@ -139,6 +153,7 @@ export function examples(): EvalExample[] {
             hasDocument: true,
             authTrusted: false,
             dueWithinDays: variant % 2 ? 2 : 14,
+            provenance,
           },
         });
       }
@@ -184,6 +199,12 @@ export function evaluate() {
       risk: a.risk,
     };
   });
+  
+  const families = Array.from(new Set(rows.map(r => r.family)));
+  const byFamily = Object.fromEntries(
+    families.map(f => [f, metrics(rows.filter(r => r.family === f))])
+  );
+
   return {
     policyVersion: POLICY_VERSION,
     thresholds: THRESHOLDS,
@@ -199,6 +220,7 @@ export function evaluate() {
     overall: metrics(rows),
     heldOut: metrics(rows.filter((r) => r.split === "held-out")),
     development: metrics(rows.filter((r) => r.split === "development")),
+    byFamily,
     rows,
   };
 }

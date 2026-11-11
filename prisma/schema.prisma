@@ -7,6 +7,7 @@ datasource db {
 }
 model Vendor {
   id          String @id
+  orgId       String @default("default-org")
   name        String
   domain      String
   phone       String
@@ -31,6 +32,7 @@ model Bill {
 }
 model ChangeRequest {
   id          String @id @default(cuid())
+  orgId       String @default("default-org")
   vendorId    String
   vendor      Vendor @relation(fields: [vendorId], references: [id])
   fingerprint String @unique
@@ -47,11 +49,47 @@ model ChangeRequest {
   status      String @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  mailboxId         String?
+  providerMessageId String?
+  providerThreadId  String?
+  retrievedAt       DateTime?
+  provenance        String?
   attachments Attachment[]
   holds       PaymentHold[]
   callback    Callback?
   decisions   Decision[]
   events      AuditEvent[]
+  assessmentHistory AssessmentVersion[]
+}
+model AssessmentVersion {
+  id         String        @id @default(cuid())
+  requestId  String
+  request    ChangeRequest @relation(fields: [requestId], references: [id])
+  version    String
+  analysis   String
+  risk       String
+  score      Int
+  createdAt  DateTime      @default(now())
+}
+model Job {
+  id         String   @id @default(cuid())
+  type       String
+  status     String   @default("pending")
+  payload    String
+  result     String?
+  attempts   Int      @default(0)
+  maxRetries Int      @default(3)
+  error      String?
+  runAt      DateTime @default(now())
+  lockedAt   DateTime?
+  lockedBy   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+model MailboxCheckpoint {
+  id        String   @id
+  cursor    String
+  updatedAt DateTime @updatedAt
 }
 model Attachment {
   id          String @id @default(cuid())

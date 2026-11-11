@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { parseEmail } from "./ingest";
-import { assess, validRouting } from "./risk";
+import { assess, validRouting, THRESHOLDS } from "./risk";
 import { analyzeWithAI } from "./ai";
 import { setRampHold } from "./ramp";
 import type {
@@ -10,7 +10,10 @@ import type {
   CaseSummary,
   ProposedBank,
   Risk,
+  User,
 } from "./types";
+import { EmailProvenance } from "./analysis/contracts";
+
 export class WorkflowError extends Error {
   constructor(
     message: string,
@@ -28,12 +31,23 @@ const includeCase = {
   callback: true,
   decisions: { orderBy: { createdAt: "desc" as const } },
   events: { orderBy: { createdAt: "asc" as const } },
+  assessmentHistory: { orderBy: { createdAt: "desc" as const } },
 };
-export async function listCases(): Promise<CaseSummary[]> {
-  const rows = await db.changeRequest.findMany({
+
+function authorize(user: User, action: "read" | "write" | "admin" | "release") {
+  if (action === "read") return true;
+  if (action === "write") return user.role === "reviewer" || user.role === "admin";
+  if (action === "release") return user.role === "reviewer" || user.role === "admin";
+  if (action === "admin") return user.role === "admin";
+  return false;
+}
+
+export async function listCases(user: User): Promise<CaseSummary[]> {
+  const rows = (await db.changeRequest.findMany({
+    where: { orgId: user.orgId } as any,
     include: { vendor: { include: { bills: true } }, holds: true },
     orderBy: { createdAt: "desc" },
-  });
+  })) as any[];
   return rows.map((r) => ({
     id: r.id,
     vendorId: r.vendorId,
@@ -45,16 +59,16 @@ export async function listCases(): Promise<CaseSummary[]> {
     status: r.status,
     createdAt: r.createdAt.toISOString(),
     amountCents: r.vendor.bills
-      .filter((b) => b.status !== "paid")
-      .reduce((s, b) => s + b.amountCents, 0),
-    holdCount: r.holds.filter((h) => h.status === "confirmed").length,
+      .filter((b: any) => b.status !== "paid")
+      .reduce((s: number, b: any) => s + b.amountCents, 0),
+    holdCount: r.holds.filter((h: any) => h.status === "confirmed").length,
   }));
 }
-export async function getCase(id: string): Promise<CaseDetail> {
-  const r = await db.changeRequest.findUnique({
-    where: { id },
+export async function getCase(id: string, user: User): Promise<CaseDetail> {
+  const r = (await db.changeRequest.findFirst({
+    where: { id, orgId: user.orgId } as any,
     include: includeCase,
-  });
+  })) as any;
   if (!r) throw new WorkflowError("Request not found.", 404);
   return {
     id: r.id,
@@ -70,25 +84,28 @@ export async function getCase(id: string): Promise<CaseDetail> {
     status: r.status,
     createdAt: r.createdAt.toISOString(),
     amountCents: r.vendor.bills
-      .filter((b) => b.status !== "paid")
-      .reduce((s, b) => s + b.amountCents, 0),
-    holdCount: r.holds.filter((h) => h.status === "confirmed").length,
+      .filter((b: any) => b.status !== "paid")
+      .reduce((s: number, b: any) => s + b.amountCents, 0),
+    holdCount: r.holds.filter((h: any) => h.status === "confirmed").length,
     proposed: JSON.parse(r.proposed) as ProposedBank,
-    assessment: JSON.parse(r.assessment) as Assessment,
+    assessment: {
+      ...JSON.parse(r.assessment),
+      provenance: r.provenance ? JSON.parse(r.provenance) : undefined,
+    } as Assessment,
     vendor: r.vendor,
     attachments: r.attachments,
     bills: r.vendor.bills
-      .filter((b) => b.status !== "paid")
-      .map((b) => ({ ...b, dueDate: b.dueDate.toISOString() })),
+      .filter((b: any) => b.status !== "paid")
+      .map((b: any) => ({ ...b, dueDate: b.dueDate.toISOString() })),
     holds: r.holds,
     callback: r.callback
       ? { ...r.callback, createdAt: r.callback.createdAt.toISOString() }
       : null,
-    decisions: r.decisions.map((d) => ({
+    decisions: r.decisions.map((d: any) => ({
       ...d,
       createdAt: d.createdAt.toISOString(),
     })),
-    events: r.events.map((e) => ({
+    events: r.events.map((e: any) => ({
       ...e,
       createdAt: e.createdAt.toISOString(),
     })),
@@ -131,6 +148,28 @@ export async function ingestRequest(
         ),
       )
     : undefined;
+
+  const stages: Record<string, any> = {
+    ingest: "complete",
+    parsing: "complete",
+    auth: options.fixture ? "complete" : "partial",
+  };
+
+  const provenance: EmailProvenance | undefined = options.fixture ? {
+    mailboxIdentity: "sarah@northstar-supply.com",
+    providerMessageId: "fixture-id",
+    providerThreadId: "fixture-thread",
+    retrievedAt: new Date().toISOString(),
+    authStatus: {
+      dkim: "pass",
+      spf: "pass",
+      dmarc: "pass",
+      aligned: true,
+      trustedReceiver: true,
+    },
+    rawBytesHash: parsed.fingerprint,
+  } : undefined;
+
   const input = {
     ...parsed,
     hasDocument: parsed.attachments.some(
@@ -138,7 +177,10 @@ export async function ingestRequest(
     ),
     authTrusted: !!options.fixture,
     dueWithinDays,
+    provenance,
   };
+  stages.extraction = "complete";
+  
   const ai = options.skipAI
     ? {
         evidence: [],
@@ -148,14 +190,56 @@ export async function ingestRequest(
         similarity: undefined,
       }
     : await analyzeWithAI(input, vendor, parsed.attachments);
+  
+  stages.model = ai.live ? "complete" : "failed";
+  
   // Extracted text fields take precedence; AI fills only missing fields from the bank letter.
   const proposed = { ...parsed.proposed };
+  
+  // A3.2: Detect conflicts between email and PDF extraction
+  const conflicts: string[] = [];
+  for (const att of parsed.attachments) {
+    if (att.mimeType === "application/pdf") {
+      const pdfProposed = JSON.parse(att.metadata).proposed as ProposedBank;
+      if (pdfProposed) {
+        for (const key of ["bankName", "accountLast4", "routing", "country"] as const) {
+          if (proposed[key] && pdfProposed[key] && proposed[key] !== pdfProposed[key]) {
+            if (!conflicts.includes(key)) conflicts.push(key);
+          }
+          // If body missing field, use PDF field
+          if (!proposed[key] && pdfProposed[key]) proposed[key] = pdfProposed[key];
+        }
+      }
+    }
+  }
+
   for (const key of ["bankName", "accountLast4", "routing", "country"] as const)
     if (!proposed[key] && ai.proposed?.[key]) proposed[key] = ai.proposed[key];
+  
   const assessment = assess({ ...input, proposed }, vendor, ai.evidence);
+  stages.scoring = "complete";
+
   assessment.analysisMode = ai.live ? "live-ai" : "rules";
   assessment.aiStatus = ai.status;
   assessment.similarity = ai.similarity;
+  assessment.stages = stages;
+  assessment.conflicts = conflicts;
+
+  if (conflicts.length > 0) {
+    assessment.evidence.push({
+      id: "extraction-conflict",
+      category: "Bank details",
+      title: "Conflicting evidence detected",
+      detail: `The email body and attachments disagree on: ${conflicts.join(", ")}. This requires manual reconciliation.`,
+      source: "Multi-source extraction",
+      points: 20,
+      confidence: "observed",
+    });
+    assessment.score = Math.min(100, assessment.score + 20);
+    if (assessment.score >= THRESHOLDS.high) assessment.risk = "high";
+    else if (assessment.score >= THRESHOLDS.medium) assessment.risk = "medium";
+  }
+  
   if (!ai.live) assessment.missing.push("AI vision / stylometry not completed");
   if (options.fixture)
     assessment.aiStatus +=
@@ -176,6 +260,7 @@ export async function ingestRequest(
         assessment: JSON.stringify(assessment),
         risk: assessment.risk,
         score: assessment.score,
+        provenance: (provenance ? JSON.stringify(provenance) : null) as any,
         attachments: {
           create: parsed.attachments.map((a) => ({
             ...a,
@@ -375,14 +460,17 @@ export async function decide(
   id: string,
   action: "approve" | "reject",
   note: string,
+  user: User,
 ) {
+  if (!authorize(user, "write"))
+    throw new WorkflowError("Only reviewers can record decisions.", 403);
   if (note.trim().length < 8)
     throw new WorkflowError("Add a decision note of at least 8 characters.");
   return db.$transaction(async (tx) => {
-    const r = await tx.changeRequest.findUniqueOrThrow({
-      where: { id },
+    const r = (await tx.changeRequest.findFirstOrThrow({
+      where: { id, orgId: user.orgId } as any,
       include: { callback: true, holds: true },
-    });
+    })) as any;
     if (r.status !== "pending")
       throw new WorkflowError(
         "This request already has a final decision.",
@@ -395,7 +483,7 @@ export async function decide(
         );
       if (r.callback && ["denied", "inconclusive"].includes(r.callback.outcome))
         throw new WorkflowError("Callback did not confirm this change.");
-      if (r.holds.some((h) => !["confirmed", "released"].includes(h.status)))
+      if (r.holds.some((h: any) => !["confirmed", "released"].includes(h.status)))
         throw new WorkflowError(
           "Resolve unconfirmed payment holds before approval.",
         );
@@ -415,7 +503,7 @@ export async function decide(
         );
     }
     const updated = await tx.changeRequest.updateMany({
-      where: { id, status: "pending" },
+      where: { id, status: "pending", orgId: user.orgId } as any,
       data: { status: action === "approve" ? "approved" : "rejected" },
     });
     if (!updated.count)
@@ -427,7 +515,7 @@ export async function decide(
       data: {
         requestId: id,
         action,
-        actor: "Local AP reviewer",
+        actor: user.name,
         note: note.trim(),
       },
     });
@@ -435,22 +523,24 @@ export async function decide(
       data: {
         requestId: id,
         type: `request_${action === "approve" ? "approved" : "rejected"}`,
-        actor: "Local AP reviewer",
+        actor: user.name,
         detail: `${note.trim()} Bank details were not written to Ramp. Existing holds remain until explicitly released.`,
       },
     });
   });
 }
-export async function releaseHolds(id: string, note: string) {
+export async function releaseHolds(id: string, note: string, user: User) {
+  if (!authorize(user, "release"))
+    throw new WorkflowError("Only reviewers can release holds.", 403);
   if (note.trim().length < 8)
     throw new WorkflowError("Add a release note of at least 8 characters.");
-  const r = await db.changeRequest.findUniqueOrThrow({
-    where: { id },
+  const r = (await db.changeRequest.findFirstOrThrow({
+    where: { id, orgId: user.orgId } as any,
     include: { holds: true },
-  });
+  })) as any;
   if (r.status === "pending")
     throw new WorkflowError("Record a final decision before releasing a hold.");
-  for (const h of r.holds.filter((h) => h.status === "confirmed")) {
+  for (const h of r.holds.filter((h: any) => h.status === "confirmed")) {
     // A Ramp bill hold is shared across requests. Never clear another investigation's protection.
     const other = await db.paymentHold.count({
       where: {
@@ -469,14 +559,14 @@ export async function releaseHolds(id: string, note: string) {
         where: { id: h.id },
         data: {
           status: "released",
-          detail: `Explicitly released by Local AP reviewer. ${note.trim()}`,
+          detail: `Explicitly released by ${user.name}. ${note.trim()}`,
         },
       }),
       db.auditEvent.create({
         data: {
           requestId: id,
           type: "hold_released",
-          actor: "Local AP reviewer",
+          actor: user.name,
           detail: `${h.billId} (${h.mode}): ${note.trim()}`,
         },
       }),

@@ -1385,6 +1385,35 @@ h1 {
   line-height: 1.8;
   margin-top: 16px;
 }
+.family-metrics {
+  margin-top: 15px;
+}
+.family-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 10px;
+}
+.family-row:last-child {
+  border-bottom: 0;
+}
+.family-row span {
+  color: var(--ink);
+  font-weight: 500;
+}
+.family-row strong {
+  color: var(--teal);
+}
+.family-row small {
+  color: var(--muted);
+  width: 50px;
+  text-align: right;
+}
+.provenance-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 .limitations svg {
   flex-shrink: 0;
   color: #ad9865;

@@ -1,9 +1,11 @@
 import { simpleParser } from "mailparser";
 import { PDFDocument } from "pdf-lib";
+import { PDFParse } from "pdf-parse";
 import { createHash } from "node:crypto";
 import type { Evidence, ProposedBank } from "./types";
 export const MAX_EMAIL_BYTES = 12 * 1024 * 1024;
 export type ParsedAttachment = {
+  id: string;
   name: string;
   mimeType: string;
   content: Buffer;
@@ -30,9 +32,12 @@ export async function parseEmail(raw: Buffer) {
       throw new Error("Maximum five attachments per request.");
     const pdf = file.content.subarray(0, 5).toString() === "%PDF-";
     const mimeType = pdf ? "application/pdf" : file.contentType;
+    const sha256 = createHash("sha256").update(file.content).digest("hex");
+    const id = `att-${sha256.slice(0, 12)}`;
+    
     let metadata: Record<string, unknown> = {
       bytes: file.size,
-      sha256: createHash("sha256").update(file.content).digest("hex"),
+      sha256,
     };
     if (pdf) {
       try {
@@ -41,6 +46,12 @@ export async function parseEmail(raw: Buffer) {
         });
         if (doc.getPageCount() > 10)
           throw new Error("Bank letters must be 10 pages or fewer.");
+        
+        // A3.1: Extract PDF text locally
+         const parser = new PDFParse({ data: file.content });
+         const pdfData = await parser.getText();
+         await parser.destroy();
+        
         metadata = {
           ...metadata,
           pages: doc.getPageCount(),
@@ -48,6 +59,8 @@ export async function parseEmail(raw: Buffer) {
           creator: doc.getCreator() ?? null,
           created: doc.getCreationDate()?.toISOString() ?? null,
           modified: doc.getModificationDate()?.toISOString() ?? null,
+          text: pdfData.text,
+          proposed: extractBank(pdfData.text),
         };
         documentFindings.push({
           id: `pdf-${attachments.length}`,
@@ -75,6 +88,7 @@ export async function parseEmail(raw: Buffer) {
       }
     }
     attachments.push({
+      id,
       name: (file.filename ?? `attachment-${attachments.length + 1}`).replace(
         /[^a-zA-Z0-9._ -]/g,
         "_",
@@ -84,14 +98,15 @@ export async function parseEmail(raw: Buffer) {
       metadata: JSON.stringify(metadata),
     });
   }
-  const proposed = extractBank(body);
+  const bodyProposed = extractBank(body);
+  
   return {
     sender,
     replyTo,
     subject: parsed.subject,
     body,
     headers,
-    proposed,
+    proposed: bodyProposed,
     attachments,
     documentFindings,
     fingerprint: createHash("sha256").update(raw).digest("hex"),

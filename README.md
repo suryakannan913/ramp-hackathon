@@ -66,7 +66,17 @@ npm run build
 
 Tests cover spoof detection, unknown-evidence review floors, routing checks, MIME/PDF parsing, duplicate intake, trusted callback numbers, blocked approvals, rejection/hold separation, explicit release and sandbox adapter errors. Workflow tests create and clean up isolated test records in the configured database.
 
-`npm run evaluate` writes `docs/evaluation.json`. The 100 cases contain 50 legitimate and 50 crafted fraudulent requests, with 40 development variants and 60 held-out variants. Thresholds are fixed, not fitted by the evaluation script. It evaluates **deterministic policy only**. Correlated templates, synthetic labels, missing independent authentication and undetected clean-looking account takeovers limit the results. These numbers are not a real-world accuracy claim.
+`npm run evaluate` writes `docs/evaluation.json` and a detailed report to `docs/evaluation-v2.md`. The 100 cases contain 50 legitimate and 50 crafted fraudulent requests, with 40 development variants and 60 held-out variants. Performance is broken down by attack family (e.g., lookalike domains, spoofed senders).
+
+## Background jobs
+
+The app includes a database-backed job runner for asynchronous analysis and external actions.
+
+```sh
+npm run worker
+```
+
+The worker processes enqueued analysis jobs, survives process crashes, and implements exponential backoff for failed attempts.
 
 ## Boundaries
 

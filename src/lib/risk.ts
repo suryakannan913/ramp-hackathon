@@ -4,8 +4,24 @@ import type {
   InvestigationInput,
   VendorContext,
 } from "./types";
-export const POLICY_VERSION = "2026-11-10.1";
+import { EmailProvenance } from "./analysis/contracts";
+
+export const POLICY_VERSION = "2026-11-10.2";
 export const THRESHOLDS = { medium: 25, high: 65 };
+
+/**
+ * A4.2: Normalize and parse domains consistently.
+ */
+export function domainOf(email: string) {
+  const clean = email.toLowerCase().trim().replace(/[<>]/g, "");
+  const domain = clean.split("@").pop() ?? "";
+  // Simple punycode detection (non-ASCII)
+  if (/[^\x00-\x7F]/.test(domain)) {
+    return domain; // Should be converted to punycode in a real app
+  }
+  return domain;
+}
+
 export function editDistance(a: string, b: string): number {
   const row = Array.from({ length: b.length + 1 }, (_, i) => i);
   for (let i = 1; i <= a.length; i++) {
@@ -23,9 +39,7 @@ export function editDistance(a: string, b: string): number {
   }
   return row[b.length];
 }
-export function domainOf(email: string) {
-  return email.split("@").pop()?.toLowerCase().replace(/>$/, "") ?? "";
-}
+
 export function validRouting(value: string) {
   if (!/^\d{9}$/.test(value) || /^0+$/.test(value)) return false;
   const d = [...value].map(Number);
@@ -44,6 +58,7 @@ export function assess(
   input: InvestigationInput,
   vendor: VendorContext,
   extra: Evidence[] = [],
+  provenance: EmailProvenance | undefined = input.provenance,
 ): Assessment {
   const evidence: Evidence[] = [];
   const missing: string[] = [];
@@ -67,6 +82,33 @@ export function assess(
       confidence,
       quote,
     });
+  
+  // A4.3: Use verified authentication status if available
+  if (provenance) {
+    const { authStatus } = provenance;
+    if (authStatus.trustedReceiver && authStatus.aligned) {
+      add(
+        "auth-verified",
+        "Authentication",
+        "Verified sender identity",
+        "The email was received via a trusted provider with valid DKIM/SPF alignment.",
+        "Trusted Mailbox",
+        -10, // Trusted provenance reduces risk
+        "observed"
+      );
+    } else if (authStatus.trustedReceiver && !authStatus.aligned) {
+      add(
+        "auth-unaligned",
+        "Authentication",
+        "Authentication alignment failure",
+        "The sender domain does not match verified DKIM/SPF signatures.",
+        "Trusted Mailbox",
+        30,
+        "observed"
+      );
+    }
+  }
+
   const senderDomain = domainOf(input.sender),
     replyDomain = domainOf(input.replyTo);
   const expected = vendor.domain.toLowerCase();

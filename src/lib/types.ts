@@ -1,3 +1,5 @@
+import type { EmailProvenance, AnalysisStageStatus } from "./analysis/contracts";
+
 export type Risk = "low" | "medium" | "high";
 export type Evidence = {
   id: string;
@@ -8,6 +10,7 @@ export type Evidence = {
   quote?: string;
   points: number;
   confidence: "observed" | "inferred" | "unknown";
+  page?: number;
 };
 export type ProposedBank = {
   bankName: string;
@@ -26,6 +29,9 @@ export type Assessment = {
   aiStatus: string;
   similarity?: number;
   assessedAt: string;
+  stages?: Record<string, AnalysisStageStatus>;
+  provenance?: EmailProvenance;
+  conflicts?: string[];
 };
 export type VendorContext = {
   id: string;
@@ -48,6 +54,7 @@ export type InvestigationInput = {
   documentFindings?: Evidence[];
   hasDocument: boolean;
   authTrusted?: boolean;
+  provenance?: EmailProvenance;
   dueWithinDays?: number;
 };
 export type CaseSummary = {
@@ -62,6 +69,13 @@ export type CaseSummary = {
   createdAt: string;
   amountCents: number;
   holdCount: number;
+};
+export type Role = "viewer" | "reviewer" | "admin";
+export type User = {
+  id: string;
+  name: string;
+  role: Role;
+  orgId: string;
 };
 export type CaseDetail = CaseSummary & {
   replyTo: string;

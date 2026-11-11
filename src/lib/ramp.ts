@@ -1,5 +1,9 @@
 import { z } from "zod";
-const rampBill = z
+
+/**
+ * Ramp bill schema based on API documentation.
+ */
+export const rampBill = z
   .object({
     id: z.string(),
     status: z.string(),
@@ -10,81 +14,139 @@ const rampBill = z
     vendor: z.unknown(),
   })
   .passthrough();
-export async function rampFetch(path: string, method = "GET", body?: unknown) {
-  if (!process.env.RAMP_ACCESS_TOKEN)
-    throw new Error("Ramp sandbox token is not configured.");
-  if (process.env.RAMP_ENVIRONMENT !== "sandbox")
-    throw new Error("Only Ramp sandbox connections are enabled in this MVP.");
-  const response = await fetch(
-    `https://demo-api.ramp.com/developer/v1${path}`,
-    {
+
+export type RampBill = z.infer<typeof rampBill>;
+
+/**
+ * Interface for Ramp client to allow injection in tests.
+ */
+export interface RampClient {
+  fetch(path: string, method?: string, body?: unknown): Promise<any>;
+  setHold(billId: string, release?: boolean): Promise<RampBill>;
+  getVendorBills(vendorId: string, pageToken?: string): Promise<{ bills: RampBill[]; next?: string }>;
+}
+
+/**
+ * Default Ramp sandbox client implementation.
+ */
+export class RampSandboxClient implements RampClient {
+  private token: string;
+  private baseUrl = "https://demo-api.ramp.com/developer/v1";
+
+  constructor(token: string) {
+    if (process.env.RAMP_ENVIRONMENT !== "sandbox") {
+      throw new Error("Only Ramp sandbox connections are enabled in this MVP.");
+    }
+    this.token = token;
+  }
+
+  async fetch(path: string, method = "GET", body?: unknown) {
+    const response = await fetch(`${this.baseUrl}${path}`, {
       method,
       headers: {
-        Authorization: `Bearer ${process.env.RAMP_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${this.token}`,
         "Content-Type": "application/json",
       },
       body: body === undefined ? undefined : JSON.stringify(body),
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),
-    },
-  );
-  if (!response.ok)
-    throw new Error(
-      `Ramp sandbox returned HTTP ${response.status}. Check access, scopes, feature availability and bill eligibility.`,
-    );
-  return response.json();
-}
-export async function setRampHold(billId: string, release = false) {
-  if (!release) {
-    const existing = rampBill.parse(
-      await rampFetch(`/bills/${encodeURIComponent(billId)}`),
-    );
-    if (existing.id !== billId)
-      throw new Error("Ramp response bill ID did not match.");
-    if (existing.status_summary === "ON_HOLD")
+    });
+
+    if (!response.ok) {
       throw new Error(
-        "Bill is already on hold. Reconcile its owner in Ramp; this investigation will not claim an existing hold.",
+        `Ramp sandbox returned HTTP ${response.status}. Check access, scopes, and bill eligibility.`,
       );
-    if (
-      existing.status !== "OPEN" ||
-      ["PAYMENT_PROCESSING", "PAYMENT_COMPLETED", "ARCHIVED"].includes(
-        existing.status_summary,
-      )
-    )
-      throw new Error("This bill is not eligible for a new payment hold.");
+    }
+    return response.json();
   }
-  const raw = await rampFetch(
-    `/bills/${encodeURIComponent(billId)}/${release ? "release" : "hold"}`,
-    "POST",
-    release
-      ? undefined
-      : { reason: "Bank-Change Guard: bank-change verification required" },
-  );
-  const bill = rampBill.parse(raw);
-  if (bill.id !== billId)
-    throw new Error("Ramp response bill ID did not match.");
-  if (!release && bill.status_summary !== "ON_HOLD")
-    throw new Error(
-      "Ramp did not confirm ON_HOLD. Reconcile the bill in Ramp before retrying.",
+
+  async setHold(billId: string, release = false): Promise<RampBill> {
+    if (!release) {
+      // B2.4: Distinguish app-owned holds and preexisting holds.
+      const existing = rampBill.parse(await this.fetch(`/bills/${encodeURIComponent(billId)}`));
+      
+      if (existing.status_summary === "ON_HOLD") {
+        throw new Error(
+          "Bill is already on hold. Reconcile its owner in Ramp; this app will not claim an existing hold.",
+        );
+      }
+      
+      if (
+        existing.status !== "OPEN" ||
+        ["PAYMENT_PROCESSING", "PAYMENT_COMPLETED", "ARCHIVED"].includes(existing.status_summary)
+      ) {
+        throw new Error("This bill is not eligible for a new payment hold.");
+      }
+    }
+
+    const raw = await this.fetch(
+      `/bills/${encodeURIComponent(billId)}/${release ? "release" : "hold"}`,
+      "POST",
+      release ? undefined : { reason: "Bank-Change Guard: bank-change verification required" },
     );
-  if (release && bill.status_summary === "ON_HOLD")
-    throw new Error("Ramp still reports ON_HOLD.");
-  return bill;
+
+    const bill = rampBill.parse(raw);
+    
+    // B2.5: Confirm hold status after action.
+    if (!release && bill.status_summary !== "ON_HOLD") {
+      throw new Error("Ramp did not confirm ON_HOLD status.");
+    }
+    if (release && bill.status_summary === "ON_HOLD") {
+      throw new Error("Ramp still reports ON_HOLD after release.");
+    }
+
+    return bill;
+  }
+
+  async getVendorBills(vendorId: string, pageToken?: string): Promise<{ bills: RampBill[]; next?: string }> {
+    const query = new URLSearchParams({
+      vendor_id: vendorId,
+      page_size: "100",
+    });
+    if (pageToken) query.append("page_token", pageToken);
+
+    const res = await this.fetch(`/bills?${query.toString()}`);
+    const parsed = z
+      .object({
+        data: z.array(rampBill),
+        page: z.object({ next: z.string().nullable() }),
+      })
+      .parse(res);
+
+    return { 
+      bills: parsed.data, 
+      next: parsed.page.next || undefined 
+    };
+  }
+
+  /**
+   * B2.7: Reconcile current provider state on timeout or crash.
+   */
+  async reconcile(billId: string): Promise<RampBill> {
+    const raw = await this.fetch(`/bills/${encodeURIComponent(billId)}`);
+    return rampBill.parse(raw);
+  }
 }
+
+// Legacy export for compatibility
+export async function rampFetch(path: string, method = "GET", body?: unknown) {
+  const client = new RampSandboxClient(process.env.RAMP_ACCESS_TOKEN || "");
+  return client.fetch(path, method, body);
+}
+
+export async function setRampHold(billId: string, release = false) {
+  const client = new RampSandboxClient(process.env.RAMP_ACCESS_TOKEN || "");
+  return client.setHold(billId, release);
+}
+
 export async function getSandboxVendorBills(vendorId: string) {
+  const client = new RampSandboxClient(process.env.RAMP_ACCESS_TOKEN || "");
+  const { bills, next } = await client.getVendorBills(vendorId);
+  
   const vendor = z
     .object({ id: z.string(), name: z.string(), country: z.string() })
     .passthrough()
-    .parse(await rampFetch(`/vendors/${encodeURIComponent(vendorId)}`));
-  const result = z
-    .object({
-      data: z.array(rampBill),
-      page: z.object({ next: z.string().nullable() }),
-    })
-    .parse(
-      await rampFetch(
-        `/bills?vendor_id=${encodeURIComponent(vendorId)}&page_size=100`,
-      ),
-    );
-  return { vendor, bills: result.data, next: result.page.next };
+    .parse(await client.fetch(`/vendors/${encodeURIComponent(vendorId)}`));
+    
+  return { vendor, bills, next };
 }

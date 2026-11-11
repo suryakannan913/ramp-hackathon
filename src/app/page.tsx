@@ -25,6 +25,11 @@ import {
   Shield,
   Paperclip,
 } from "lucide-react";
+import {
+  EvidenceCard,
+  AnalysisStageBadge,
+  ConflictAlert,
+} from "@/components/evidence";
 import type { CaseDetail, CaseSummary, Risk } from "@/lib/types";
 import type { evaluate } from "@/lib/evaluation";
 type Overview = {
@@ -583,6 +588,19 @@ export default function Home() {
                       <div className="tab-body">
                         {tab === "evidence" && (
                           <>
+                            {detail.assessment.conflicts && (
+                              <ConflictAlert fields={detail.assessment.conflicts} />
+                            )}
+                            <div className="section-title">
+                              <h3>Investigation stages</h3>
+                              <span>Pipeline status</span>
+                            </div>
+                            <div className="flex flex-wrap mb-6">
+                              {detail.assessment.stages && Object.entries(detail.assessment.stages).map(([stage, status]) => (
+                                <AnalysisStageBadge key={stage} stage={stage} status={status} />
+                              ))}
+                            </div>
+
                             <div className="section-title">
                               <h3>What changed</h3>
                               <span>Compare with trusted vendor record</span>
@@ -618,6 +636,40 @@ export default function Home() {
                                 </small>
                               </div>
                             </div>
+                            {detail.assessment.provenance && (
+                              <div className="provenance-card mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                                <div className="flex items-center gap-2 mb-2 text-blue-800 font-semibold">
+                                  <ShieldCheck size={18} />
+                                  <span>Email Provenance</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div>
+                                    <span className="text-gray-500">DKIM:</span>{" "}
+                                    <span className={detail.assessment.provenance.authStatus.dkim === "pass" ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                                      {detail.assessment.provenance.authStatus.dkim.toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">SPF:</span>{" "}
+                                    <span className={detail.assessment.provenance.authStatus.spf === "pass" ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                                      {detail.assessment.provenance.authStatus.spf.toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">Alignment:</span>{" "}
+                                    <span className={detail.assessment.provenance.authStatus.aligned ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                                      {detail.assessment.provenance.authStatus.aligned ? "ALIGNED" : "MISALIGNED"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">Receiver:</span>{" "}
+                                    <span className={detail.assessment.provenance.authStatus.trustedReceiver ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                                      {detail.assessment.provenance.authStatus.trustedReceiver ? "TRUSTED" : "UNTRUSTED"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             <div className="section-title">
                               <h3>Evidence breakdown</h3>
                               <span>
@@ -626,34 +678,7 @@ export default function Home() {
                             </div>
                             <div className="evidence-list">
                               {detail.assessment.evidence.map((e) => (
-                                <div className="evidence-item" key={e.id}>
-                                  <div
-                                    className={`evidence-icon ${e.points ? "flag" : ""}`}
-                                  >
-                                    {e.points ? (
-                                      <AlertTriangle size={16} />
-                                    ) : e.confidence === "unknown" ? (
-                                      <Clock3 size={16} />
-                                    ) : (
-                                      <CheckCircle2 size={16} />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <div className="evidence-title">
-                                      <h4>{e.title}</h4>
-                                      {e.points > 0 && (
-                                        <span>+{e.points} pts</span>
-                                      )}
-                                    </div>
-                                    <p>{e.detail}</p>
-                                    {e.quote && (
-                                      <blockquote>{e.quote}</blockquote>
-                                    )}
-                                    <small>
-                                      {e.category} · {e.source} · {e.confidence}
-                                    </small>
-                                  </div>
-                                </div>
+                                <EvidenceCard key={e.id} evidence={e} />
                               ))}
                             </div>
                             <div className="coverage">
@@ -1198,13 +1223,16 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="limitations">
-                      <h3>What these numbers mean</h3>
-                      {evaluation.limitations.map((l) => (
-                        <p key={l}>
-                          <AlertTriangle size={15} />
-                          {l}
-                        </p>
-                      ))}
+                      <h3>Performance by attack family</h3>
+                      <div className="family-metrics">
+                        {Object.entries(evaluation.byFamily).map(([name, m]) => (
+                          <div key={name} className="family-row">
+                            <span>{name}</span>
+                            <strong>{(m.holdRecall * 100).toFixed(0)}% recall</strong>
+                            <small>{m.count} cases</small>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="eval-results">
