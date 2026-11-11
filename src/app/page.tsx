@@ -32,6 +32,7 @@ type Overview = {
   vendors: { id: string; name: string; domain: string; phone: string }[];
   settings: {
     aiConfigured: boolean;
+    aiProvider: "Claude" | "OpenAI" | null;
     rampConfigured: boolean;
     rampEnvironment: string;
     mode: string;
@@ -1261,14 +1262,15 @@ export default function Home() {
                   <dt>Connection</dt>
                   <dd>
                     {overview?.settings.aiConfigured
-                      ? "API key present · live calls on new uploads"
+                      ? `${overview.settings.aiProvider} configured · live calls on new uploads`
                       : "No API key configured"}
                   </dd>
                   <dt>Demo cases</dt>
                   <dd>Deterministic scoring · no AI calls</dd>
                 </dl>
                 <div className="setup-note">
-                  Set <code>OPENAI_API_KEY</code> in your local{" "}
+                  Set <code>ANTHROPIC_API_KEY</code> for Claude or{" "}
+                  <code>OPENAI_API_KEY</code> for OpenAI in your local{" "}
                   <code>.env</code> and restart. Upload a new email to run live
                   analysis.
                 </div>

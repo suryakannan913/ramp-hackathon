@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { getAnalysisProvider } from "@/lib/ai";
 import { db } from "@/lib/db";
 import {
   listCases,
@@ -42,7 +43,8 @@ export async function GET(req: NextRequest) {
         select: { id: true, name: true, domain: true, phone: true },
       }),
       settings: {
-        aiConfigured: !!process.env.OPENAI_API_KEY,
+        aiConfigured: !!getAnalysisProvider(),
+        aiProvider: getAnalysisProvider(),
         rampConfigured: !!process.env.RAMP_ACCESS_TOKEN,
         rampEnvironment: process.env.RAMP_ENVIRONMENT ?? "sandbox",
         mode: "Local demo",
