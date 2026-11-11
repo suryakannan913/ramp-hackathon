@@ -151,7 +151,7 @@ export default function Home() {
       setUploadVendor((v) => v || data.vendors[0]?.id || "");
       const chosen = id ?? latestSelection.current ?? "";
       const next =
-        chosen ||
+        (data.cases.some((c) => c.id === chosen) ? chosen : "") ||
         data.cases.find((c) => c.risk === "high")?.id ||
         data.cases[0]?.id ||
         "";
@@ -1390,6 +1390,12 @@ export default function Home() {
                 <X size={19} />
               </button>
             </div>
+            {error && (
+              <div className="error-banner" role="alert">
+                <AlertTriangle size={16} />
+                <span>{error}</span>
+              </div>
+            )}
             <label htmlFor="vendor">Match a trusted vendor</label>
             <select
               id="vendor"
