@@ -82,11 +82,15 @@ export function assess(
       confidence,
       quote,
     });
-  
+
   // A4.3: Use verified authentication status if available
   if (provenance) {
     const { authStatus } = provenance;
-    if (authStatus.trustedReceiver && authStatus.aligned) {
+    if (
+      authStatus.trustedReceiver &&
+      authStatus.aligned &&
+      authStatus.dmarc === "pass"
+    ) {
       add(
         "auth-verified",
         "Authentication",
@@ -94,7 +98,7 @@ export function assess(
         "The email was received via a trusted provider with valid DKIM/SPF alignment.",
         "Trusted Mailbox",
         -10, // Trusted provenance reduces risk
-        "observed"
+        "observed",
       );
     } else if (authStatus.trustedReceiver && !authStatus.aligned) {
       add(
@@ -104,7 +108,7 @@ export function assess(
         "The sender domain does not match verified DKIM/SPF signatures.",
         "Trusted Mailbox",
         30,
-        "observed"
+        "observed",
       );
     }
   }

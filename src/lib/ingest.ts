@@ -33,8 +33,8 @@ export async function parseEmail(raw: Buffer) {
     const pdf = file.content.subarray(0, 5).toString() === "%PDF-";
     const mimeType = pdf ? "application/pdf" : file.contentType;
     const sha256 = createHash("sha256").update(file.content).digest("hex");
-    const id = `att-${sha256.slice(0, 12)}`;
-    
+    const id = `att-${attachments.length + 1}-${sha256.slice(0, 12)}`;
+
     let metadata: Record<string, unknown> = {
       bytes: file.size,
       sha256,
@@ -46,12 +46,11 @@ export async function parseEmail(raw: Buffer) {
         });
         if (doc.getPageCount() > 10)
           throw new Error("Bank letters must be 10 pages or fewer.");
-        
+
         // A3.1: Extract PDF text locally
-         const parser = new PDFParse({ data: file.content });
-         const pdfData = await parser.getText();
-         await parser.destroy();
-        
+        const parser = new PDFParse({ data: file.content });
+        const pdfData = await parser.getText().finally(() => parser.destroy());
+
         metadata = {
           ...metadata,
           pages: doc.getPageCount(),
@@ -99,7 +98,7 @@ export async function parseEmail(raw: Buffer) {
     });
   }
   const bodyProposed = extractBank(body);
-  
+
   return {
     sender,
     replyTo,

@@ -11,6 +11,12 @@ import {
   completeCallback,
   releaseHolds,
 } from "../src/lib/service";
+const reviewer = {
+  id: "test-reviewer",
+  name: "Test reviewer",
+  role: "reviewer",
+  orgId: "default-org",
+} as const;
 const vendorId = `test-vendor-${Date.now()}`;
 async function email(key: string) {
   return Buffer.concat([
@@ -40,17 +46,17 @@ test("high-risk lifecycle preserves holds through rejection and uses trusted con
   });
   assert.equal(result.id, duplicate.id);
   assert.ok(duplicate.duplicate);
-  let c = await getCase(result.id);
+  let c = await getCase(result.id, reviewer);
   assert.equal(c.risk, "high");
   assert.equal(c.holds.length, 1);
   assert.equal(c.holds[0].status, "confirmed");
   assert.equal(c.callback?.phone, vendors[0].phone);
   await assert.rejects(
-    () => decide(c.id, "approve", "Looks good to me"),
+    () => decide(c.id, "approve", "Looks good to me", reviewer),
     /callback/,
   );
   await assert.rejects(
-    () => releaseHolds(c.id, "Safe to release now"),
+    () => releaseHolds(c.id, "Safe to release now", reviewer),
     /final decision/,
   );
   await completeCallback(c.id, "denied");
@@ -59,26 +65,28 @@ test("high-risk lifecycle preserves holds through rejection and uses trusted con
     /already recorded/,
   );
   await assert.rejects(
-    () => decide(c.id, "approve", "Vendor denied request"),
+    () => decide(c.id, "approve", "Vendor denied request", reviewer),
     /callback/,
   );
   await decide(
     c.id,
     "reject",
     "Vendor denied the change on the trusted callback.",
+    reviewer,
   );
-  c = await getCase(c.id);
+  c = await getCase(c.id, reviewer);
   assert.equal(c.status, "rejected");
   assert.equal(c.holds[0].status, "confirmed");
   await assert.rejects(
-    () => decide(c.id, "approve", "Trying again after reject"),
+    () => decide(c.id, "approve", "Trying again after reject", reviewer),
     /final decision/,
   );
   await releaseHolds(
     c.id,
     "Rejected proposed bank details; retain original vendor account.",
+    reviewer,
   );
-  c = await getCase(c.id);
+  c = await getCase(c.id, reviewer);
   assert.equal(c.holds[0].status, "released");
   assert.ok(c.events.some((e) => e.type === "hold_released"));
 });
@@ -88,7 +96,7 @@ test("medium-risk approval needs callback; bank baseline remains unchanged", asy
     skipAI: true,
   });
   await assert.rejects(
-    () => decide(result.id, "approve", "Reviewed the email"),
+    () => decide(result.id, "approve", "Reviewed the email", reviewer),
     /callback/,
   );
   await completeCallback(result.id, "confirmed");
@@ -96,8 +104,9 @@ test("medium-risk approval needs callback; bank baseline remains unchanged", asy
     result.id,
     "approve",
     "Confirmed through simulated trusted contact.",
+    reviewer,
   );
-  const c = await getCase(result.id);
+  const c = await getCase(result.id, reviewer);
   assert.equal(c.status, "approved");
   assert.equal(c.vendor.accountLast4, "2841");
   assert.equal(c.holds.length, 0);

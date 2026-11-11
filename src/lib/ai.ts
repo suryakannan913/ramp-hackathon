@@ -97,6 +97,7 @@ async function analyzeWithClaude(context: string, pdfs: ParsedAttachment[]) {
           content: [
             ...pdfs.map((p) => ({
               type: "document",
+              title: p.id,
               source: {
                 type: "base64",
                 media_type: "application/pdf",
@@ -150,6 +151,11 @@ export async function analyzeWithAI(
     const context = JSON.stringify({
       vendor: { name: vendor.name, history: JSON.parse(vendor.history) },
       email: { from: input.sender, subject: input.subject, body: input.body },
+      documents: pdfs.map((pdf, index) => ({
+        attachmentId: pdf.id,
+        filename: pdf.name,
+        position: index + 1,
+      })),
     });
     const client =
       provider === "OpenAI"

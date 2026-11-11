@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import type { User } from "./types";
 import { WorkflowError } from "./service";
-export function authorize(req: NextRequest) {
+export function authorize(req: NextRequest): User {
   const token = process.env.APP_ACCESS_TOKEN;
   if (token) {
     const given = Buffer.from(
@@ -20,6 +21,12 @@ export function authorize(req: NextRequest) {
     )
       throw new WorkflowError("Cross-origin changes are not allowed.", 403);
   }
+  return {
+    id: "local-reviewer",
+    name: "Local AP reviewer",
+    role: "reviewer",
+    orgId: "default-org",
+  };
 }
 export function apiError(error: unknown) {
   if (error instanceof WorkflowError)

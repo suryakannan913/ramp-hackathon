@@ -21,9 +21,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
-    authorize(req);
+    const user = authorize(req);
     const id = req.nextUrl.searchParams.get("id");
-    if (id) return NextResponse.json(await getCase(id));
+    if (id) return NextResponse.json(await getCase(id, user));
     if (req.nextUrl.searchParams.has("evaluation"))
       return NextResponse.json(evaluate());
     const fixture = req.nextUrl.searchParams.get("fixture");
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       });
     }
     return NextResponse.json({
-      cases: await listCases(),
+      cases: await listCases(user),
       vendors: await db.vendor.findMany({
         select: { id: true, name: true, domain: true, phone: true },
       }),
@@ -90,7 +90,7 @@ const actionSchema = z.discriminatedUnion("action", [
 ]);
 export async function POST(req: NextRequest) {
   try {
-    authorize(req);
+    const user = authorize(req);
     if (
       Number(req.headers.get("content-length") ?? 0) >
       MAX_EMAIL_BYTES + 1_000_000
@@ -114,8 +114,8 @@ export async function POST(req: NextRequest) {
     if (data.action === "callback")
       await completeCallback(data.id, data.outcome);
     if (data.action === "decide")
-      await decide(data.id, data.decision, data.note);
-    if (data.action === "release") await releaseHolds(data.id, data.note);
+      await decide(data.id, data.decision, data.note, user);
+    if (data.action === "release") await releaseHolds(data.id, data.note, user);
     if (data.action === "retry") await retryHolds(data.id);
     if (data.action === "sandbox-preview")
       return NextResponse.json(await getSandboxVendorBills(data.vendorId));

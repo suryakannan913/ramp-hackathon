@@ -70,13 +70,13 @@ Tests cover spoof detection, unknown-evidence review floors, routing checks, MIM
 
 ## Background jobs
 
-The app includes a database-backed job runner for asynchronous analysis and external actions.
+An experimental database-backed job runner is available for manually queued analysis jobs. The intake route processes investigations directly.
 
 ```sh
 npm run worker
 ```
 
-The worker processes enqueued analysis jobs, survives process crashes, and implements exponential backoff for failed attempts.
+The worker backs off after failed attempts. Interrupted jobs may need manual recovery. The separate voice worker requires `TWILIO_AUTH_TOKEN`, an HTTPS `VOICE_PUBLIC_ORIGIN`, and `OPENAI_API_KEY`. It is a media bridge prototype. The dashboard still uses simulated callbacks.
 
 ## Boundaries
 

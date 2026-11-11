@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { parseEmail } from "./ingest";
 import { assess, validRouting, THRESHOLDS } from "./risk";
-import { analyzeWithAI } from "./ai";
+import { analyzeWithAI, getAnalysisProvider } from "./ai";
 import { setRampHold } from "./ramp";
 import type {
   Assessment,
@@ -36,8 +36,10 @@ const includeCase = {
 
 function authorize(user: User, action: "read" | "write" | "admin" | "release") {
   if (action === "read") return true;
-  if (action === "write") return user.role === "reviewer" || user.role === "admin";
-  if (action === "release") return user.role === "reviewer" || user.role === "admin";
+  if (action === "write")
+    return user.role === "reviewer" || user.role === "admin";
+  if (action === "release")
+    return user.role === "reviewer" || user.role === "admin";
   if (action === "admin") return user.role === "admin";
   return false;
 }
@@ -155,20 +157,22 @@ export async function ingestRequest(
     auth: options.fixture ? "complete" : "partial",
   };
 
-  const provenance: EmailProvenance | undefined = options.fixture ? {
-    mailboxIdentity: "sarah@northstar-supply.com",
-    providerMessageId: "fixture-id",
-    providerThreadId: "fixture-thread",
-    retrievedAt: new Date().toISOString(),
-    authStatus: {
-      dkim: "pass",
-      spf: "pass",
-      dmarc: "pass",
-      aligned: true,
-      trustedReceiver: true,
-    },
-    rawBytesHash: parsed.fingerprint,
-  } : undefined;
+  const provenance: EmailProvenance | undefined = options.fixture
+    ? {
+        mailboxIdentity: "sarah@northstar-supply.com",
+        providerMessageId: "fixture-id",
+        providerThreadId: "fixture-thread",
+        retrievedAt: new Date().toISOString(),
+        authStatus: {
+          dkim: "unknown",
+          spf: "unknown",
+          dmarc: "unknown",
+          aligned: false,
+          trustedReceiver: false,
+        },
+        rawBytesHash: parsed.fingerprint,
+      }
+    : undefined;
 
   const input = {
     ...parsed,
@@ -180,7 +184,7 @@ export async function ingestRequest(
     provenance,
   };
   stages.extraction = "complete";
-  
+
   const ai = options.skipAI
     ? {
         evidence: [],
@@ -190,24 +194,40 @@ export async function ingestRequest(
         similarity: undefined,
       }
     : await analyzeWithAI(input, vendor, parsed.attachments);
-  
-  stages.model = ai.live ? "complete" : "failed";
-  
+
+  stages.model = options.skipAI
+    ? "skipped"
+    : ai.live
+      ? "complete"
+      : getAnalysisProvider()
+        ? "failed"
+        : "not_configured";
+
   // Extracted text fields take precedence; AI fills only missing fields from the bank letter.
   const proposed = { ...parsed.proposed };
-  
+
   // A3.2: Detect conflicts between email and PDF extraction
   const conflicts: string[] = [];
   for (const att of parsed.attachments) {
     if (att.mimeType === "application/pdf") {
       const pdfProposed = JSON.parse(att.metadata).proposed as ProposedBank;
       if (pdfProposed) {
-        for (const key of ["bankName", "accountLast4", "routing", "country"] as const) {
-          if (proposed[key] && pdfProposed[key] && proposed[key] !== pdfProposed[key]) {
+        for (const key of [
+          "bankName",
+          "accountLast4",
+          "routing",
+          "country",
+        ] as const) {
+          if (
+            proposed[key] &&
+            pdfProposed[key] &&
+            proposed[key] !== pdfProposed[key]
+          ) {
             if (!conflicts.includes(key)) conflicts.push(key);
           }
           // If body missing field, use PDF field
-          if (!proposed[key] && pdfProposed[key]) proposed[key] = pdfProposed[key];
+          if (!proposed[key] && pdfProposed[key])
+            proposed[key] = pdfProposed[key];
         }
       }
     }
@@ -215,7 +235,7 @@ export async function ingestRequest(
 
   for (const key of ["bankName", "accountLast4", "routing", "country"] as const)
     if (!proposed[key] && ai.proposed?.[key]) proposed[key] = ai.proposed[key];
-  
+
   const assessment = assess({ ...input, proposed }, vendor, ai.evidence);
   stages.scoring = "complete";
 
@@ -238,8 +258,10 @@ export async function ingestRequest(
     assessment.score = Math.min(100, assessment.score + 20);
     if (assessment.score >= THRESHOLDS.high) assessment.risk = "high";
     else if (assessment.score >= THRESHOLDS.medium) assessment.risk = "medium";
+    assessment.summary =
+      "Email and attachment bank details conflict. Resolve the discrepancies before approval.";
   }
-  
+
   if (!ai.live) assessment.missing.push("AI vision / stylometry not completed");
   if (options.fixture)
     assessment.aiStatus +=
@@ -262,7 +284,7 @@ export async function ingestRequest(
         score: assessment.score,
         provenance: (provenance ? JSON.stringify(provenance) : null) as any,
         attachments: {
-          create: parsed.attachments.map((a) => ({
+          create: parsed.attachments.map(({ id: _analysisId, ...a }) => ({
             ...a,
             content: new Uint8Array(a.content),
           })),
@@ -290,9 +312,10 @@ export async function ingestRequest(
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      const duplicate = await db.changeRequest.findUniqueOrThrow({
+      const duplicate = await db.changeRequest.findUnique({
         where: { fingerprint: parsed.fingerprint },
       });
+      if (!duplicate) throw error;
       if (duplicate.vendorId !== vendorId)
         throw new WorkflowError(
           "This email is already linked to a different vendor.",
@@ -477,13 +500,29 @@ export async function decide(
         409,
       );
     if (action === "approve") {
+      const assessment = JSON.parse(r.assessment) as Assessment;
+      if (assessment.conflicts?.length)
+        throw new WorkflowError(
+          "Resolve conflicting bank details before approval.",
+        );
+      if (
+        r.holds.some(
+          (hold: { mode: string }) => hold.mode === "ramp-sandbox",
+        ) &&
+        r.callback?.mode !== "live"
+      )
+        throw new WorkflowError(
+          "A sandbox hold requires live callback verification before approval.",
+        );
       if (r.risk !== "low" && r.callback?.outcome !== "confirmed")
         throw new WorkflowError(
           "Medium and high risk requests require a confirmed callback before approval.",
         );
       if (r.callback && ["denied", "inconclusive"].includes(r.callback.outcome))
         throw new WorkflowError("Callback did not confirm this change.");
-      if (r.holds.some((h: any) => !["confirmed", "released"].includes(h.status)))
+      if (
+        r.holds.some((h: any) => !["confirmed", "released"].includes(h.status))
+      )
         throw new WorkflowError(
           "Resolve unconfirmed payment holds before approval.",
         );
