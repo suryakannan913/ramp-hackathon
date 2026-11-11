@@ -29,7 +29,7 @@ If macOS offloads files in Documents/iCloud as `dataless`, clone this repository
 8. Open Cedar's low-risk fixture to demonstrate standard human approval. Harbor demonstrates medium-risk review and callback gating.
 9. Open **Policy evaluation** to inspect precision, recall, false positives, missed fraud and all 100 labeled cases.
 
-Use **New investigation** to upload an `.eml` or load a demo. Downloadable examples are in `fixtures/emails/`; regenerate with `npm run fixtures`. Loading a demo is idempotent. Re-uploading an email treats authentication headers as untrusted, so a clean uploaded email has a medium-risk review floor. Only synthetic seeded fixtures can demonstrate the low-risk path.
+Use **New investigation** to upload an `.eml` or load a demo. Run `npm run demo:reset` to replay the three shipped synthetic cases; it preserves other uploads and refuses to reset non-simulated holds. Downloadable examples are in `fixtures/emails/`; regenerate with `npm run fixtures`. Loading a demo is idempotent. Re-uploading an email treats authentication headers as untrusted, so a clean uploaded email has a medium-risk review floor. Only synthetic seeded fixtures can demonstrate the low-risk path.
 
 ## What is real and what is simulated
 

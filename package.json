@@ -13,7 +13,8 @@
     "postinstall": "prisma generate",
     "fixtures": "tsx scripts/export-fixtures.ts",
     "vendor:add": "tsx scripts/setup-vendor.ts",
-    "format": "prettier --write src prisma tests scripts docs/*.md README.md next.config.ts tsconfig.json"
+    "format": "prettier --write src prisma tests scripts docs/*.md README.md next.config.ts tsconfig.json",
+    "demo:reset": "tsx scripts/reset-demo.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
