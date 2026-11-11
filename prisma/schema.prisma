@@ -27,7 +27,7 @@ model Bill {
   amountCents Int
   dueDate     DateTime
   status      String @default("pending")
-  source      String @default("demo")
+  source      String @default("sample")
   holds       PaymentHold[]
 }
 model ChangeRequest {

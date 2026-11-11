@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { assess, validRouting, editDistance } from "../src/lib/risk";
 import { vendors } from "../src/lib/fixtures";
 import { parseEmail } from "../src/lib/ingest";
-import { demoEmail } from "../src/lib/demo";
+import { sampleEmail } from "../src/lib/sample-cases";
 import { evaluate, examples } from "../src/lib/evaluation";
 const v = vendors[0];
 const input = {
@@ -56,7 +56,7 @@ test("unknown evidence cannot produce low risk", () => {
   );
 });
 test("MIME parser preserves the original bank letter and excludes HTML execution", async () => {
-  const raw = await demoEmail("attack");
+  const raw = await sampleEmail("attack");
   const parsed = await parseEmail(raw);
   assert.equal(parsed.sender, "sarah@northstar-supp1y.com");
   assert.equal(parsed.attachments[0].mimeType, "application/pdf");

@@ -1,10 +1,10 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { demoCases, vendors } from "./fixtures";
+import { sampleCases, vendors } from "./fixtures";
 import { db } from "./db";
 import { ingestRequest } from "./service";
-export async function demoEmail(key: string) {
-  const fixture = demoCases.find((c) => c.key === key);
-  if (!fixture) throw new Error("Unknown demo case");
+export async function sampleEmail(key: string) {
+  const fixture = sampleCases.find((c) => c.key === key);
+  if (!fixture) throw new Error("Unknown sample case");
   const vendor = vendors.find((v) => v.id === fixture.vendorId)!;
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -24,7 +24,7 @@ export async function demoEmail(key: string) {
     font: bold,
   });
   const lines = [
-    "Synthetic document for the Bank-Change Guard demo.",
+    "Synthetic document for the Bank-Change Guard sample case.",
     "",
     `Beneficiary: ${vendor.name}`,
     `Bank: ${fixture.bank}`,
@@ -54,15 +54,15 @@ export async function demoEmail(key: string) {
     .toString("base64")
     .match(/.{1,76}/g)!
     .join("\r\n");
-  const boundary = "bankguard-demo-boundary";
+  const boundary = "bankguard-sample-boundary";
   return Buffer.from(
     [
       `From: ${fixture.sender}`,
       "To: ap@example.com",
       `Reply-To: ${fixture.reply}`,
       `Subject: ${fixture.subject}`,
-      `Message-ID: <${fixture.key}@bankguard.demo>`,
-      `Authentication-Results: demo.fixture; ${fixture.auth}`,
+      `Message-ID: <${fixture.key}@samples.bankguard.test>`,
+      `Authentication-Results: sample.fixture; ${fixture.auth}`,
       "MIME-Version: 1.0",
       `Content-Type: multipart/mixed; boundary="${boundary}"`,
       "",
@@ -118,11 +118,21 @@ export async function seedVendors() {
       update: {},
     });
 }
-export async function loadDemo(key: string) {
+export async function loadSampleCase(key: string) {
+  const f = sampleCases.find((c) => c.key === key);
+  if (!f) throw new Error("Unknown sample case");
   await seedVendors();
-  const f = demoCases.find((c) => c.key === key);
-  if (!f) throw new Error("Unknown demo");
-  return ingestRequest(await demoEmail(key), f.vendorId, {
+  const existing = await db.changeRequest.findFirst({
+    where: {
+      vendorId: f.vendorId,
+      subject: f.subject,
+      events: { some: { type: "received", actor: "Sample seed" } },
+    },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  if (existing) return { id: existing.id, duplicate: true };
+  return ingestRequest(await sampleEmail(key), f.vendorId, {
     fixture: true,
     skipAI: true,
   });

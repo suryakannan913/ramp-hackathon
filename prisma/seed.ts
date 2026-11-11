@@ -1,9 +1,10 @@
 import "dotenv/config";
-import { seedVendors, loadDemo } from "../src/lib/demo";
+import { seedVendors, loadSampleCase } from "../src/lib/sample-cases";
 import { db } from "../src/lib/db";
 async function main() {
   await seedVendors();
-  for (const key of ["attack", "legitimate", "ambiguous"]) await loadDemo(key);
+  for (const key of ["attack", "legitimate", "ambiguous"])
+    await loadSampleCase(key);
   console.log(
     "Seeded three synthetic vendor cases. All payment holds and callbacks are simulated.",
   );

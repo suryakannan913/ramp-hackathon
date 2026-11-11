@@ -9,7 +9,7 @@ This is an execution plan for the remaining Bank-Change Guard work. It describes
 
 The repository contains a Next.js/TypeScript application, Prisma/SQLite persistence, `.eml` upload, deterministic scoring, three synthetic cases, simulated holds/callbacks, human decisions, an audit timeline, optional OpenAI/Ramp adapters, and 10 existing tests. The last completed implementation validation passed tests, type checking, and a production build.
 
-Important limitations to preserve in descriptions and demonstrations:
+Important limitations to preserve in documentation:
 
 - OpenAI and Ramp adapters have not been validated against connected live services.
 - PDF metadata inspection works; live visual and historical-language analysis need validation.
@@ -37,7 +37,7 @@ Person B owns these existing files:
 - `src/lib/service.ts`, `src/lib/ramp.ts`, `src/lib/db.ts`, `src/lib/http.ts`, `src/lib/types.ts`
 - `src/app/api/`, `src/app/page.tsx`, `src/app/globals.css`, `src/app/layout.tsx`
 - `tests/workflow.test.ts`, `tests/ramp.test.ts`
-- `scripts/setup-vendor.ts`, `scripts/reset-demo.ts`, deployment-independent worker/runtime configuration
+- `scripts/setup-vendor.ts`, `scripts/reset-samples.ts`, deployment-independent worker/runtime configuration
 
 Person A can create `src/lib/email/`, `src/lib/analysis/`, `src/components/evidence/`, and `fixtures/evaluation-v2/`. Person B can create `src/lib/voice/`, `src/lib/auth/`, `src/lib/jobs/`, `workers/`, and new API routes.
 
@@ -50,8 +50,8 @@ Person B is the merge owner for shared types, database migrations, the main page
 3. A builds trusted mailbox ingestion and investigation improvements. B builds sandbox hold reconciliation and the voice callback service. These tracks can proceed independently against mocks.
 4. A hands B contract fixtures and UI evidence components. B wires them into the API, job runner, and main UI.
 5. A runs detection evaluation. B runs state, permission, provider-failure, and restart tests.
-6. Both complete the integrated demo and compare persisted records with actual sandbox/provider state once external access is supplied.
-7. Complete the production-hardening checks before allowing real payment-related use. Do not describe a demo milestone as production-ready.
+6. Both complete the integrated workflow and compare persisted records with actual sandbox/provider state once external access is supplied.
+7. Complete the production-hardening checks before allowing real payment-related use.
 
 No task requires the other person to finish a complete subsystem before work begins. Use the agreed fixtures and interfaces while waiting.
 
@@ -112,7 +112,7 @@ Preserve these rules:
 
 - All bank changes require an explicit human decision and note.
 - Keep the existing medium/high callback requirement unless both owners explicitly document and test a policy change.
-- A simulated callback cannot authorize a live/sandbox integration path. It is valid only for a clearly separated demo workflow.
+- A simulated callback cannot authorize a live/sandbox integration path. It is valid only for a clearly separated sample workflow.
 - Voice/model output cannot approve changes, release holds, change contacts, or write vendor bank details.
 - Rejection does not release payments. Release is separate, authorized, documented, and checked against every active protection reason.
 - Approval is a recorded decision, not a bank-account mutation. Adding actual bank-detail writes is a separate scope decision after account verification and change-control requirements are agreed.
@@ -157,4 +157,4 @@ A adds new explicit evaluation commands; B adds explicit worker/voice startup an
 - Network failure, duplicate events, out-of-order callbacks, concurrent review, and worker restart produce no false confirmations or duplicate external actions.
 - The evaluation report includes recall and failures alongside precision, with independent holdout limitations stated.
 
-Demo completion means this walkthrough and the P0 tasks in both guides pass. Production readiness additionally requires both P1 checklists and a documented release review. Neither means that the system detects every fraud attempt.
+Integration completion means this walkthrough and the P0 tasks in both guides pass. Production readiness additionally requires both P1 checklists and a documented release review. Neither means that the system detects every fraud attempt.

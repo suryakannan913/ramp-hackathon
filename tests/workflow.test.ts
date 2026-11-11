@@ -3,7 +3,7 @@ import test, { after } from "node:test";
 import assert from "node:assert/strict";
 import { db } from "../src/lib/db";
 import { vendors } from "../src/lib/fixtures";
-import { demoEmail } from "../src/lib/demo";
+import { sampleEmail } from "../src/lib/sample-cases";
 import {
   ingestRequest,
   getCase,
@@ -20,7 +20,7 @@ const reviewer = {
 const vendorId = `test-vendor-${Date.now()}`;
 async function email(key: string) {
   return Buffer.concat([
-    await demoEmail(key),
+    await sampleEmail(key),
     Buffer.from(`\r\nTest run ${vendorId}`),
   ]);
 }

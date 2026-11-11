@@ -3,7 +3,7 @@ import { analyzeWithAI } from "../src/lib/ai";
 import { db } from "../src/lib/db";
 import { assess } from "../src/lib/risk";
 
-// A dummy worker to demonstrate background processing
+// Worker for manually queued analysis jobs
 async function main() {
   console.log("Starting background worker...");
 

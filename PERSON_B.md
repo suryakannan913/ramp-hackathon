@@ -6,7 +6,7 @@ Make the investigation workflow execute external actions safely, attribute decis
 
 Read [the shared handoff](README.md) first. Obtaining accounts, supplying/connecting API tokens, and Vercel deployment are outside your assignment. Build provider-independent tests and runbooks first. Actual sandbox calls and test phone calls are separate connected acceptance checks once external access is supplied.
 
-P0 means required for the next credible connected demonstration, including baseline access controls for any exposed callback endpoint. P1 means required before real financial operational use. Real callbacks and production hardening exceed the original weekend's simulated-callback scope, so keep those milestones distinct.
+P0 means required for the next credible integration validation, including baseline access controls for any exposed callback endpoint. P1 means required before real financial operational use. Real callbacks and production hardening exceed the original weekend's simulated-callback scope, so keep those milestones distinct.
 
 ## Start here
 
@@ -37,7 +37,7 @@ Read `AGENTS.md` and the applicable installed Next.js docs before changing route
 - `prisma/schema.prisma`, `src/lib/db.ts`, and existing migration.
 - `src/app/api/guard/route.ts`, `src/app/api/files/[id]/route.ts`.
 - `src/app/page.tsx`: current combined workspace UI.
-- `tests/workflow.test.ts`, `tests/ramp.test.ts`, and `scripts/reset-demo.ts`.
+- `tests/workflow.test.ts`, `tests/ramp.test.ts`, and `scripts/reset-samples.ts`.
 
 You are the merge owner for shared schema/types, package files, environment examples, main UI, and root README. Preserve A's ownership of parsing, AI, scoring, and benchmark logic.
 
@@ -47,13 +47,13 @@ You are the merge owner for shared schema/types, package files, environment exam
 2. Add records for intake provenance, mailbox checkpoints/delivery deduplication, immutable assessment versions, jobs/action attempts, provider identifiers, callback attempts, and authenticated actors. Store references to the precise assessment and proposed bank details being reviewed.
 3. Separate analysis state from review state, hold state, and call state. A pending analysis is not a low-risk request. A completed call is not verified confirmation.
 4. Persist a request and analysis job before doing a long model call. Commit checkpoint advancement only after durable intake; failed processing must remain recoverable.
-5. Implement a database-backed outbox/job runner with claims/leases, bounded retries, timeouts, backoff, attempt records, and a visible terminal failure. Add a documented worker command. A single durable local worker is sufficient for the next demo; do not invent a distributed platform first.
+5. Implement a database-backed outbox/job runner with claims/leases, bounded retries, timeouts, backoff, attempt records, and a visible terminal failure. Add a documented worker command. A single durable local worker is sufficient for the first integration milestone; do not invent a distributed platform first.
 6. Persist protection/callback intents atomically with the policy transition that requires them. Run external calls outside database transactions. Save their results afterward.
 7. If A's deterministic preflight already marks a case high risk, enqueue protection before waiting for AI. A later low score cannot automatically remove protection.
 8. Add `uncertain` action status for timeouts/crashes where the provider may have accepted an operation. Reconcile before retrying, confirming success, or sending another call.
 9. Use unique job/action keys and conditional state updates. A replayed email, worker restart, or duplicate webhook must not duplicate an external action.
 10. Prevent asynchronous analysis from changing the grounds of an already-recorded decision. New material evidence creates a new assessment/review step, not a silent rewrite.
-11. Keep SQLite/local demo compatibility for P0. Database portability can follow in P1; never replace the existing SQLite migration with a PostgreSQL migration in the same migration history.
+11. Keep SQLite/local workspace compatibility for P0. Database portability can follow in P1; never replace the existing SQLite migration with a PostgreSQL migration in the same migration history.
 
 **Tests:** restart after intake; crash after external action before persistence; expired lease; two workers claiming one job; duplicate message; slow analysis; late assessment after decision; failed job visible in UI.
 
@@ -77,7 +77,7 @@ The existing adapter only targets the sandbox and validates `ON_HOLD`. Preserve 
 10. Add UI states for requested, confirmed, uncertain, failed, and released protection. A simulated hold must remain visibly distinct even when credentials exist.
 11. Extend the trusted-vendor setup/import workflow so an operator can inspect the mapping and whether all eligible bills are covered. Do not overwrite a trusted phone or bank baseline using the suspicious request.
 
-**Connected demonstration:** use a supplied sandbox vendor and unpaid bill, submit a high-risk request, verify the bill is held in Ramp independently of the app, exercise rejection with the hold retained, then explicitly release after all protection reasons are resolved. Also test one real sandbox error path.
+**Connected validation:** use a supplied sandbox vendor and unpaid bill, submit a high-risk request, verify the bill is held in Ramp independently of the app, exercise rejection with the hold retained, then explicitly release after all protection reasons are resolved. Also test one real sandbox error path.
 
 **Acceptance:** both systems agree on hold state; incomplete sync and API failure never produce a false protection claim; test evidence contains sandbox IDs and timestamps, with sensitive data redacted.
 
@@ -97,11 +97,11 @@ Credential connection is excluded, but the media bridge, webhook verification, c
 6. Bridge the documented telephony audio format to the chosen voice API, including any required transcoding. Implement start, stop, disconnect, interruption, timeouts, and cleanup. Keep secrets on the server.
 7. Give the agent a narrow script: identify itself and the AP verification purpose, establish that it is speaking to an appropriate contact, and ask whether the specific proposed change was requested. Refer to only the minimum needed bank identifiers, such as last four digits; do not solicit full account credentials.
 8. Treat spoken instructions and transcripts as untrusted. The voice model cannot approve a request, release payment, change a trusted phone, collect passwords/one-time codes, or execute arbitrary tools.
-9. Store a timestamped speaker-labeled transcript and proposed outcome. A bare “yes,” voicemail, ambiguous identity, contradictory answers, dropped audio, or a failed model session must not become confirmed verification. Require reviewer attestation of adequate verification evidence before unlocking a non-demo approval.
+9. Store a timestamped speaker-labeled transcript and proposed outcome. A bare “yes,” voicemail, ambiguous identity, contradictory answers, dropped audio, or a failed model session must not become confirmed verification. Require reviewer attestation of adequate verification evidence before unlocking a live approval.
 10. Support denied and inconclusive results explicitly. Keep transport failure and vendor denial separate. A completed telephony status alone cannot mark verification confirmed.
 11. For the original vision's recording capability, implement controlled recording and protected playback/storage, with the project's approved notice/consent and retention behavior. Test only with an expected recipient and agreed recording settings. Do not claim a transcript is an audio recording. If recording is disabled, label that coverage accurately.
 12. Handle duplicate/out-of-order webhooks and callbacks received after the request was decided. Preserve history and route new material information to review; never silently change a final decision.
-13. Remove the ability for a browser caller to use the current simulated `callback` action to mark a live/sandbox request confirmed. Keep simulator controls only inside the isolated demo mode.
+13. Remove the ability for a browser caller to use the current simulated `callback` action to mark a live/sandbox request confirmed. Keep simulator controls only inside the isolated sample workflow.
 14. Add UI call progress, provider failure, retry eligibility, transcript, outcome, recording availability, and reviewer verification state. Preserve the trusted-phone display.
 
 **Tests:** supplied email phone ignored; client destination override rejected; fake provider signature rejected; wrong call/request association rejected; duplicate/out-of-order events; voicemail; no answer; “yes” without adequate identity; denial; dropped stream; retry after uncertain initiation; recording disabled/unavailable; transcript prompt injection; simulated confirmation cannot authorize sandbox workflow.
@@ -118,11 +118,11 @@ Credential connection is excluded, but the media bridge, webhook verification, c
 4. Protect original email, PDF, transcript, recording, and export access. Prevent cross-organization object-ID access even if a caller knows the ID.
 5. Persist actor IDs, assessment version, reviewed bank-detail snapshot, note, and outcome together. Client fields cannot impersonate another reviewer or organization.
 6. Define how a pending request is invalidated/re-reviewed when trusted contacts or the proposed bank version change. Bind verification to the exact proposal being approved.
-7. Disable anonymous fallback and synthetic fixture endpoints in the non-demo mode. A shared access token is not a multi-user identity system.
-8. Keep the current callback-gated medium/high approval policy, plus the distinction between simulated/live verification. Make any demo exception explicit and impossible to apply to imported sandbox bills.
+7. Disable anonymous fallback and synthetic fixture endpoints in the live mode. A shared access token is not a multi-user identity system.
+8. Keep the current callback-gated medium/high approval policy, plus the distinction between simulated/live verification. Make any simulation exception explicit and impossible to apply to imported sandbox bills.
 9. Cover CSRF/session handling and provider webhook authentication through their respective paths; do not loosen all origin/auth checks to make a webhook work.
 
-**Tests:** anonymous read/write; viewer mutation; unauthorized hold release; spoofed actor; wrong organization; protected attachment/recording access; changed proposal after verification; demo endpoint in live mode; concurrent approve/reject.
+**Tests:** anonymous read/write; viewer mutation; unauthorized hold release; spoofed actor; wrong organization; protected attachment/recording access; changed proposal after verification; sample endpoint in live mode; concurrent approve/reject.
 
 **Acceptance:** mutations are attributable to an authenticated authorized actor; unauthorized API calls fail even if the UI is bypassed.
 
@@ -130,13 +130,13 @@ Credential connection is excluded, but the media bridge, webhook verification, c
 
 ## B5. P0: integrate A's evidence and finish the connected workflow
 
-1. Consume A's envelope/result contracts in `service.ts`. Keep compatibility with existing demo cases and clearly distinguish source/provenance from analysis coverage.
+1. Consume A's envelope/result contracts in `service.ts`. Keep compatibility with existing sample cases and clearly distinguish source/provenance from analysis coverage.
 2. Persist A's original bytes, source links, assessment versions, conflicts, and missing evidence. Coordinate mailbox checkpoint commits with A's adapter.
 3. Split the large main page into maintainable workspace components where useful, preserving the existing visual structure. Integrate A's evidence components rather than reimplementing their source logic.
 4. Display separate states for intake, analysis, protection, verification, and reviewer decision. Show specific actionable failures rather than one generic “done” or “AI enabled” badge.
 5. Wire actual evaluation results into the Policy evaluation screen; label deterministic, live-AI, mock, and full-pipeline runs distinctly. Do not imply that 100% precision means all fraud was stopped.
 6. Add browser walkthroughs for source-linked findings, partial analysis, held bill, real/simulated callback distinction, rejected change with retained hold, and explicit release.
-7. Document repeatable worker/voice startup, isolated testing, recovery, and connected demo rehearsal. Keep `demo:reset` unable to delete or reset real/sandbox action records.
+7. Document repeatable worker/voice startup, isolated testing, recovery, and integration testing. Keep `samples:reset` unable to delete or reset real/sandbox action records.
 8. Keep approval as a recorded decision. Actual vendor bank-account writes remain explicitly out of scope until the team separately defines account verification and controlled application of approved changes.
 
 **Acceptance:** the joint walkthrough in the shared handoff passes; no late model result, browser button, or synthetic callback bypasses approval or protection controls.
@@ -154,7 +154,7 @@ This work is not a Vercel deployment request. Develop and verify the controls in
 - **Monitoring:** expose job health, queue age, sync lag, unconfirmed protection, call failures, and analysis coverage. Log correlation IDs and redacted error classes. Test an alert path without contacting real vendors unnecessarily.
 - **Recovery:** test worker restart, duplicate delivery, database restore, external hold preserved during outage, and recovery from provider downtime. Document manual checks in Ramp when ownership/status cannot be established.
 - **Bounded resource use:** rate-limit uploads and callback initiation; limit parse/model/audio resources; avoid allowing unbounded worker retries or long database transactions across network calls.
-- **Isolation:** verify organization scoping across records, storage objects, jobs, exports, and provider mappings. Keep production, sandbox, and demo records/actions distinct.
+- **Isolation:** verify organization scoping across records, storage objects, jobs, exports, and provider mappings. Keep production, sandbox, and sample records/actions distinct.
 - **Change control:** version policy/prompt/worker releases, add CI with isolated test data, gate paid/live tests explicitly, and document rollback. Do not auto-migrate production data from preview/test jobs.
 - **Release review:** complete an actual permission/failure/recovery review and record unresolved risks before using real payment workflows. Real bank-detail application requires its own separately agreed controls.
 
@@ -166,7 +166,7 @@ This work is not a Vercel deployment request. Develop and verify the controls in
 
 Supply A with the intake/job integration interface, stable attachment IDs and protected URLs, assessment persistence rules, actor/organization context, and the report schema expected by the UI. Confirm exactly when mailbox checkpoints are advanced. Give A provider-response fixtures for operational failures without exposing secrets or private financial data.
 
-Ask A to independently review the combined demo and your callback/protection behavior. Independently review A's benchmark labels; do not change labels to match predictions.
+Ask A to independently review the integrated workflow and your callback/protection behavior. Independently review A's benchmark labels; do not change labels to match predictions.
 
 ## Final checklist
 

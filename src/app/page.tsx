@@ -314,19 +314,16 @@ export default function Home() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="demo-indicator">
+          <div className="workspace-indicator">
             <span className="dot" />
-            Local demo environment
+            Local workspace
           </div>
-          <p>
-            Payments and callbacks are simulated unless a bill is explicitly
-            connected to Ramp sandbox.
-          </p>
+          <p>Callbacks are simulated. Sample bills use simulated holds.</p>
           <div className="profile">
             <div className="avatar">SK</div>
             <div>
               <strong>AP reviewer</strong>
-              <small>Local demo identity</small>
+              <small>Local reviewer identity</small>
             </div>
           </div>
         </div>
@@ -346,10 +343,6 @@ export default function Home() {
             </span>
           </div>
           <div className="topbar-right">
-            <span className="env-pill">
-              <span className="dot" />
-              Demo mode
-            </span>
             <button
               className="icon-button"
               onClick={() => refresh().catch((e) => setError(e.message))}
@@ -716,8 +709,8 @@ export default function Home() {
                                         "en-US",
                                       )}{" "}
                                       ·{" "}
-                                      {b.source === "demo"
-                                        ? "Demo bill"
+                                      {b.source === "sample"
+                                        ? "Sample bill"
                                         : "Ramp sandbox"}
                                     </small>
                                   </div>
@@ -847,9 +840,8 @@ export default function Home() {
                                 used.
                               </p>
                               <small>
-                                This demo records a simulated transcript. It
-                                does not place a call or establish real-world
-                                identity.
+                                The simulator saves a transcript without placing
+                                a call.
                               </small>
                             </div>
                             {detail.callback &&
@@ -877,8 +869,8 @@ export default function Home() {
                               <div className="simulation">
                                 <h3>Run callback simulation</h3>
                                 <p>
-                                  Choose the vendor’s response for this demo.
-                                  The transcript will be saved with the
+                                  Choose the simulated vendor response. The
+                                  transcript will be saved with the
                                   investigation.
                                 </p>
                                 <div className="simulation-actions">
@@ -1090,7 +1082,7 @@ export default function Home() {
                       text={
                         selected
                           ? "Loading investigation…"
-                          : "Start an investigation by uploading an email or loading a demo case."
+                          : "Start an investigation by uploading an email or loading a sample case."
                       }
                     />
                   )}
@@ -1293,7 +1285,7 @@ export default function Home() {
                       ? `${overview.settings.aiProvider} configured · live calls on new uploads`
                       : "No API key configured"}
                   </dd>
-                  <dt>Demo cases</dt>
+                  <dt>Sample cases</dt>
                   <dd>Deterministic scoring · no AI calls</dd>
                 </dl>
                 <div className="setup-note">
@@ -1320,7 +1312,7 @@ export default function Home() {
                       ? "Token configured"
                       : "No sandbox token configured"}
                   </dd>
-                  <dt>Demo bills</dt>
+                  <dt>Sample bills</dt>
                   <dd>Always simulated · no Ramp mutations</dd>
                 </dl>
                 <div className="setup-note">
@@ -1362,9 +1354,8 @@ export default function Home() {
                   numbers. No telephony provider is connected.
                 </p>
                 <div className="setup-note">
-                  Real calls and voice recordings are outside this MVP. A
-                  simulated confirmation is never presented as real
-                  verification.
+                  The workspace uses callback simulations. A simulated
+                  confirmation is never presented as real verification.
                 </div>
               </div>
               <div className="integration-card">
@@ -1374,8 +1365,8 @@ export default function Home() {
                 </div>
                 <h2>Access & approval</h2>
                 <p>
-                  Every bank change requires a human decision. This local demo
-                  uses one reviewer identity.
+                  Every bank change requires a human decision. This local
+                  workspace uses one reviewer identity.
                 </p>
                 <div className="setup-note">
                   The server binds to localhost. Set{" "}
@@ -1390,7 +1381,6 @@ export default function Home() {
             <ShieldCheck size={13} />
             Bank-Change Guard{" "}
             <span>Evidence before action. A human at every decision.</span>
-            <small>Weekend MVP</small>
           </footer>
         </main>
       </div>
@@ -1461,8 +1451,8 @@ export default function Home() {
               )}
               Investigate request
             </button>
-            <div className="demo-divider">OR EXPLORE A DEMO CASE</div>
-            <div className="demo-choices">
+            <div className="sample-divider">OR OPEN A SAMPLE CASE</div>
+            <div className="sample-choices">
               {[
                 ["attack", "Lookalike attack", "$48K bill · high risk"],
                 [
@@ -1476,10 +1466,10 @@ export default function Home() {
                   "Country change · medium risk",
                 ],
               ].map(([key, title, desc]) => (
-                <div className="demo-choice" key={key}>
+                <div className="sample-choice" key={key}>
                   <button
                     disabled={busy}
-                    onClick={() => act({ action: "demo", key })}
+                    onClick={() => act({ action: "sample", key })}
                   >
                     <strong>
                       {title}
@@ -1500,9 +1490,8 @@ export default function Home() {
               ))}
             </div>
             <p className="modal-note">
-              Demo cases are synthetic. Downloading and re-uploading a fixture
-              treats its authentication headers as untrusted, just like any
-              other uploaded email.
+              Uploaded emails, including samples, are checked using unverified
+              authentication headers.
             </p>
           </section>
         </div>

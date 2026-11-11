@@ -12,7 +12,7 @@ import {
   retryHolds,
   WorkflowError,
 } from "@/lib/service";
-import { loadDemo, demoEmail } from "@/lib/demo";
+import { loadSampleCase, sampleEmail } from "@/lib/sample-cases";
 import { MAX_EMAIL_BYTES } from "@/lib/ingest";
 import { authorize, apiError } from "@/lib/http";
 import { evaluate } from "@/lib/evaluation";
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     if (fixture) {
       if (!["attack", "legitimate", "ambiguous"].includes(fixture))
         throw new WorkflowError("Unknown fixture.");
-      return new NextResponse(new Uint8Array(await demoEmail(fixture)), {
+      return new NextResponse(new Uint8Array(await sampleEmail(fixture)), {
         headers: {
           "Content-Type": "message/rfc822",
           "Content-Disposition": `attachment; filename="${fixture}.eml"`,
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
         aiProvider: getAnalysisProvider(),
         rampConfigured: !!process.env.RAMP_ACCESS_TOKEN,
         rampEnvironment: process.env.RAMP_ENVIRONMENT ?? "sandbox",
-        mode: "Local demo",
+        mode: "Local workspace",
         callbackMode: "simulated",
         bankSync: false,
       },
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 }
 const actionSchema = z.discriminatedUnion("action", [
   z.object({
-    action: z.literal("demo"),
+    action: z.literal("sample"),
     key: z.enum(["attack", "legitimate", "ambiguous"]),
   }),
   z.object({
@@ -109,8 +109,8 @@ export async function POST(req: NextRequest) {
       );
     }
     const data = actionSchema.parse(await req.json());
-    if (data.action === "demo")
-      return NextResponse.json(await loadDemo(data.key));
+    if (data.action === "sample")
+      return NextResponse.json(await loadSampleCase(data.key));
     if (data.action === "callback")
       await completeCallback(data.id, data.outcome);
     if (data.action === "decide")
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       const { bills, next } = await getSandboxVendorBills(data.rampVendorId);
       if (next)
         throw new WorkflowError(
-          "More than 100 sandbox bills were returned. Import was stopped to avoid partial protection. Paginated production sync is outside this MVP.",
+          "More than 100 sandbox bills were returned. Import was stopped to avoid partial protection.",
         );
       let imported = 0;
       for (const b of bills)

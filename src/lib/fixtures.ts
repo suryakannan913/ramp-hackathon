@@ -44,7 +44,7 @@ export const vendors: VendorContext[] = [
     ]),
   },
 ];
-export const demoCases = [
+export const sampleCases = [
   {
     key: "attack",
     vendorId: "v-northstar",

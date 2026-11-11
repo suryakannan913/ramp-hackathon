@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
-import { loadDemo } from "../src/lib/demo";
+import { loadSampleCase } from "../src/lib/sample-cases";
 import { vendors } from "../src/lib/fixtures";
 async function main() {
-  // Only the shipped synthetic Message-IDs qualify. Never reset sandbox holds.
+  // Select cases created by the seed workflow, including earlier versions.
   const requests = await db.changeRequest.findMany({
     where: {
       vendorId: { in: vendors.map((v) => v.id) },
-      headers: { contains: "@bankguard.demo>" },
+      events: { some: { type: "received", actor: "Sample seed" } },
     },
     include: { holds: true },
   });
@@ -21,12 +21,14 @@ async function main() {
     db.decision.deleteMany({ where: { requestId } }),
     db.callback.deleteMany({ where: { requestId } }),
     db.paymentHold.deleteMany({ where: { requestId } }),
+    db.assessmentVersion.deleteMany({ where: { requestId } }),
     db.attachment.deleteMany({ where: { requestId } }),
     db.changeRequest.deleteMany({ where: { id: requestId } }),
   ]);
-  for (const key of ["attack", "legitimate", "ambiguous"]) await loadDemo(key);
+  for (const key of ["attack", "legitimate", "ambiguous"])
+    await loadSampleCase(key);
   console.log(
-    "Restored three synthetic demo cases. Other uploads and sandbox investigations were preserved.",
+    "Restored three synthetic sample cases. Other uploads and sandbox investigations were preserved.",
   );
 }
 main()

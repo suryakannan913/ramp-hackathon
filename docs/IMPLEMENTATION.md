@@ -1,4 +1,4 @@
-# Bank-Change Guard MVP
+# Bank-Change Guard implementation
 
 ## Milestones
 
@@ -6,11 +6,11 @@
 2. Investigation: MIME/PDF ingestion, deterministic policy, optional live AI and embeddings.
 3. Workflow: durable simulated holds, trusted-number callback, gated decisions and audit log.
 4. Product: AP inbox, evidence viewer, upload, vendor history, evaluation view.
-5. Verification: workflow tests, synthetic evaluation, production build and demo guide.
+5. Verification: workflow tests, synthetic evaluation, production build and investigation guide.
 
 ## Integration boundary
 
-No credentials were provided at setup. Demo mode works entirely locally. Ramp vendor/bill reads are optional; hold mutations must not be fabricated. The public OpenAPI schema documents POST /bills/{bill_id}/hold and /release with bills:write scope. A sandbox adapter validates ON_HOLD responses. Demo bills always remain explicitly simulated. Sandbox credentials and account feature access have not been tested. Callbacks are simulated and human approvals do not mutate Ramp bank details.
+No credentials were provided at setup. Local workspace works entirely locally. Ramp vendor/bill reads are optional; hold mutations must not be fabricated. The public OpenAPI schema documents POST /bills/{bill_id}/hold and /release with bills:write scope. A sandbox adapter validates ON_HOLD responses. Sample bills always remain explicitly simulated. Sandbox credentials and account feature access have not been tested. Callbacks are simulated and human approvals do not mutate Ramp bank details.
 
 Sources checked: https://docs.ramp.com/llms-api.txt, https://support.ramp.com/hold-payment-for-bills-and-vendors/, https://developers.openai.com/api/docs/guides/structured-outputs, https://developers.openai.com/api/docs/guides/file-inputs.
 

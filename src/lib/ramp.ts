@@ -39,7 +39,7 @@ export class RampSandboxClient implements RampClient {
   constructor(token: string) {
     if (!token.trim()) throw new Error("Ramp sandbox token is not configured.");
     if (process.env.RAMP_ENVIRONMENT !== "sandbox") {
-      throw new Error("Only Ramp sandbox connections are enabled in this MVP.");
+      throw new Error("Only Ramp sandbox connections are enabled.");
     }
     this.token = token.trim();
   }

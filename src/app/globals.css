@@ -203,7 +203,7 @@ button svg {
   margin-top: auto;
   padding: 20px 7px 0;
 }
-.demo-indicator {
+.workspace-indicator {
   display: flex;
   gap: 6px;
   align-items: center;
@@ -218,7 +218,7 @@ button svg {
   display: inline-block;
   flex-shrink: 0;
 }
-.demo-indicator .dot {
+.workspace-indicator .dot {
   color: var(--teal);
 }
 .sidebar-bottom > p {
@@ -1581,14 +1581,14 @@ h1 {
 .full {
   width: 100%;
 }
-.demo-divider {
+.sample-divider {
   font-size: 8px;
   color: #a7af98;
   letter-spacing: 1px;
   text-align: center;
   margin: 24px 0 16px;
 }
-.demo-choice {
+.sample-choice {
   display: flex;
   align-items: center;
   border: 1px solid var(--line);
@@ -1596,20 +1596,20 @@ h1 {
   margin-top: 8px;
   padding-right: 9px;
 }
-.demo-choice > button:first-child {
+.sample-choice > button:first-child {
   background: white;
   flex: 1;
   border: 0;
   text-align: left;
   padding: 12px;
 }
-.demo-choice strong {
+.sample-choice strong {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
   font-weight: 500;
 }
-.demo-choice small {
+.sample-choice small {
   display: block;
   color: var(--muted);
   font-size: 9px;

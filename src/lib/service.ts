@@ -293,9 +293,9 @@ export async function ingestRequest(
           create: [
             {
               type: "received",
-              actor: options.fixture ? "Demo seed" : "Local AP reviewer",
+              actor: options.fixture ? "Sample seed" : "Local AP reviewer",
               detail: options.fixture
-                ? "Synthetic demo email received."
+                ? "Synthetic sample email received."
                 : "Original .eml preserved; authentication headers are supplied, not independently verified.",
             },
             {

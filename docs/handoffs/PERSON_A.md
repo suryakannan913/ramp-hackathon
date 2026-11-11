@@ -6,7 +6,7 @@ Turn the current rules-based investigation into a provenance-aware, evidence-bac
 
 Read [the shared handoff](README.md) first. It defines ownership, proposed contracts, synchronization, and joint acceptance. Obtaining accounts, providing/connecting API tokens, and Vercel deployment are not part of your assignment. Implement and test against fixtures without waiting for external access.
 
-P0 means required for the next credible connected demonstration. P1 means required before real operational use or a stated follow-up improvement. Do P0 in order; do not spend the first milestone redesigning the whole UI.
+P0 means required for the next credible integration validation. P1 means required before real operational use or a stated follow-up improvement. Do P0 in order; do not spend the first milestone redesigning the whole UI.
 
 ## Start here
 
@@ -44,12 +44,12 @@ Do not directly rewrite Person B's `service.ts`, Prisma schema, route handlers, 
 
 1. Create `src/lib/analysis/contracts.ts` using the fields in the shared handoff.
 2. Separate raw parsing, authentication provenance, bank-field extraction, model calls, evidence validation, and policy scoring. Make model and mailbox clients injectable so tests do not require network access.
-3. Preserve the existing public behavior through wrappers until B switches the orchestrator to the new contract. Do not break `parseEmail`, `assess`, or demo seeding without an agreed migration.
+3. Preserve the existing public behavior through wrappers until B switches the orchestrator to the new contract. Do not break `parseEmail`, `assess`, or sample seeding without an agreed migration.
 4. Add source references to extraction results and findings. Use stable attachment IDs or ingestion-time content IDs that B can map to persisted attachment IDs.
 5. Add explicit stage status: not configured, skipped, complete, partial, timeout, refused, invalid result, or failed. Missing/failed work must not look like a clean finding.
 6. Send B one valid, one partial, and one failed serialized result fixture, along with persistence needs and examples of source conflicts.
 
-**Acceptance:** contract fixtures validate; an invalid model response never enters the evidence list as observed fact; current demo tests continue to pass.
+**Acceptance:** contract fixtures validate; an invalid model response never enters the evidence list as observed fact; current fixture tests continue to pass.
 
 **Suggested commit:** `Define provenance-aware intake and investigation contracts`.
 
@@ -90,7 +90,7 @@ Use the Gmail API adapter as the first mailbox implementation. Begin with an exp
 
 **Tests:** invented quote rejected; wrong attachment/page rejected; email/PDF disagreement preserved; model prompt injection cannot change workflow state; service timeout preserves deterministic evidence; embedding failure does not erase successful document findings; scanned or unreadable document stays unknown; missing full bank details cannot be inferred as facts.
 
-**Connected validation, once access is supplied:** run new legitimate, ambiguous, and fraudulent uploads with actual analysis; inspect every cited source; verify processing time and usage; save a redacted run report. Seeded demo cases intentionally skip AI, so loading a demo button is not a live-AI test.
+**Connected validation, once access is supplied:** run new legitimate, ambiguous, and fraudulent uploads with actual analysis; inspect every cited source; verify processing time and usage; save a redacted run report. Seeded sample cases intentionally skip AI, so loading a sample case is not a live-AI test.
 
 **Acceptance:** every material AI finding is traceable to a real source, partial coverage is visible, and conflicts cannot silently become approved bank details.
 
@@ -158,7 +158,7 @@ Deliver these items before requesting integration review:
 - [ ] Email/PDF conflicts survive extraction and force review.
 - [ ] Missing history and failed AI stages cannot appear as successful clean checks.
 - [ ] Detection results include false negatives and reviewer workload.
-- [ ] B has integrated the contracts/components without duplicate schemas or breaking the demo.
+- [ ] B has integrated the contracts/components without duplicate schemas or breaking existing workflows.
 - [ ] Connected email/AI tests are passed or individually marked not run.
 - [ ] Each completed milestone is committed and pushed to your branch.
 
