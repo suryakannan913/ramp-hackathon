@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+model Vendor {
+  id          String @id
+  name        String
+  domain      String
+  phone       String
+  country     String
+  bankName    String
+  accountLast4 String
+  routing     String
+  history     String
+  requests    ChangeRequest[]
+  bills       Bill[]
+}
+model Bill {
+  id          String @id
+  vendorId    String
+  vendor      Vendor @relation(fields: [vendorId], references: [id])
+  invoice     String
+  amountCents Int
+  dueDate     DateTime
+  status      String @default("pending")
+  source      String @default("demo")
+  holds       PaymentHold[]
+}
+model ChangeRequest {
+  id          String @id @default(cuid())
+  vendorId    String
+  vendor      Vendor @relation(fields: [vendorId], references: [id])
+  fingerprint String @unique
+  subject     String
+  sender      String
+  replyTo     String
+  body        String
+  headers     String
+  rawEmail    Bytes
+  proposed    String
+  assessment  String
+  risk        String
+  score       Int
+  status      String @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  attachments Attachment[]
+  holds       PaymentHold[]
+  callback    Callback?
+  decisions   Decision[]
+  events      AuditEvent[]
+}
+model Attachment {
+  id          String @id @default(cuid())
+  requestId   String
+  request     ChangeRequest @relation(fields: [requestId], references: [id])
+  name        String
+  mimeType    String
+  content     Bytes
+  metadata    String
+}
+model PaymentHold {
+  id          String @id @default(cuid())
+  requestId   String
+  request     ChangeRequest @relation(fields: [requestId], references: [id])
+  billId      String
+  bill        Bill @relation(fields: [billId], references: [id])
+  status      String @default("pending")
+  mode        String @default("simulated")
+  detail      String
+  updatedAt   DateTime @updatedAt
+  @@unique([requestId, billId])
+}
+model Callback {
+  id          String @id @default(cuid())
+  requestId   String @unique
+  request     ChangeRequest @relation(fields: [requestId], references: [id])
+  phone       String
+  mode        String @default("simulated")
+  outcome     String
+  transcript  String
+  createdAt   DateTime @default(now())
+}
+model Decision {
+  id          String @id @default(cuid())
+  requestId   String
+  request     ChangeRequest @relation(fields: [requestId], references: [id])
+  action      String
+  actor       String
+  note        String
+  createdAt   DateTime @default(now())
+}
+model AuditEvent {
+  id          String @id @default(cuid())
+  requestId   String
+  request     ChangeRequest @relation(fields: [requestId], references: [id])
+  type        String
+  actor       String
+  detail      String
+  createdAt   DateTime @default(now())
+}

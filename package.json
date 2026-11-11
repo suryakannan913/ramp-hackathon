@@ -1,0 +1,40 @@
+{
+  "name": "bank-change-guard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "evaluate": "tsx scripts/evaluate.ts",
+    "db:setup": "prisma migrate deploy && tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "next": "16.4.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "mailparser": "^3.9.0",
+    "pdf-lib": "^1.17.1",
+    "openai": "^6.0.0",
+    "zod": "^4.0.0",
+    "lucide-react": "^0.468.0",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "prisma": "6.19.3",
+    "typescript": "^5.9.0",
+    "tsx": "^4.20.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/mailparser": "^3.4.0"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0"
+  }
+}
