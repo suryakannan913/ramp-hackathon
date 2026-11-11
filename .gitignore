@@ -7,3 +7,7 @@ node_modules
 *.tsbuildinfo
 prisma/*.db*
 coverage/
+
+# Local recovery copies created for macOS cloud-offloaded files.
+.git-cloud-backup/
+node_modules-cloud-backup/

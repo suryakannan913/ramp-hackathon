@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
+    "dev": "next dev --webpack --hostname 127.0.0.1",
+    "build": "next build --webpack",
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
@@ -12,7 +12,8 @@
     "db:setup": "prisma migrate deploy && tsx prisma/seed.ts",
     "postinstall": "prisma generate",
     "fixtures": "tsx scripts/export-fixtures.ts",
-    "vendor:add": "tsx scripts/setup-vendor.ts"
+    "vendor:add": "tsx scripts/setup-vendor.ts",
+    "format": "prettier --write src prisma tests scripts docs/*.md README.md next.config.ts tsconfig.json"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
@@ -33,6 +34,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "prettier": "^3.9.10",
     "prisma": "6.19.3",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0"
