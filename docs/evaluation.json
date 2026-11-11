@@ -1,0 +1,853 @@
+{
+  "policyVersion": "2026-11-10.1",
+  "thresholds": {
+    "medium": 25,
+    "high": 65
+  },
+  "dataset": "100 synthetic policy-level cases (50 legitimate / 50 fraudulent)",
+  "method": "Fixed thresholds; 40 development cases and 60 held-out variants. No threshold optimization is performed by this script. Same-family variants are correlated, not an independent real-world test.",
+  "limitations": [
+    "Evaluates deterministic scoring only; not MIME parsing, document vision or live AI.",
+    "Uploaded authentication headers remain untrusted, so missing independent authentication imposes a medium-risk review floor.",
+    "Clean-looking compromised mailboxes can evade high-risk detection.",
+    "Synthetic labels and template variants do not establish real-world accuracy."
+  ],
+  "overall": {
+    "count": 100,
+    "tp": 15,
+    "fp": 0,
+    "fn": 35,
+    "tn": 50,
+    "holdPrecision": 1,
+    "holdRecall": 0.3,
+    "legitimateHoldRate": 0,
+    "reviewPrecision": 0.5,
+    "reviewRecall": 1
+  },
+  "heldOut": {
+    "count": 60,
+    "tp": 8,
+    "fp": 0,
+    "fn": 22,
+    "tn": 30,
+    "holdPrecision": 1,
+    "holdRecall": 0.26666666666666666,
+    "legitimateHoldRate": 0,
+    "reviewPrecision": 0.5,
+    "reviewRecall": 1
+  },
+  "development": {
+    "count": 40,
+    "tp": 7,
+    "fp": 0,
+    "fn": 13,
+    "tn": 20,
+    "holdPrecision": 1,
+    "holdRecall": 0.35,
+    "legitimateHoldRate": 0,
+    "reviewPrecision": 0.5,
+    "reviewRecall": 1
+  },
+  "rows": [
+    {
+      "id": "legitimate-0-0",
+      "label": "legitimate",
+      "family": "Routine domestic update",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-0-1",
+      "label": "legitimate",
+      "family": "Routine domestic update",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-0-2",
+      "label": "legitimate",
+      "family": "Routine domestic update",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-0-3",
+      "label": "legitimate",
+      "family": "Routine domestic update",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-0-4",
+      "label": "legitimate",
+      "family": "Routine domestic update",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-1-0",
+      "label": "legitimate",
+      "family": "Urgent but legitimate",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-1-1",
+      "label": "legitimate",
+      "family": "Urgent but legitimate",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-1-2",
+      "label": "legitimate",
+      "family": "Urgent but legitimate",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-1-3",
+      "label": "legitimate",
+      "family": "Urgent but legitimate",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-1-4",
+      "label": "legitimate",
+      "family": "Urgent but legitimate",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-2-0",
+      "label": "legitimate",
+      "family": "New finance contact",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-2-1",
+      "label": "legitimate",
+      "family": "New finance contact",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-2-2",
+      "label": "legitimate",
+      "family": "New finance contact",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-2-3",
+      "label": "legitimate",
+      "family": "New finance contact",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-2-4",
+      "label": "legitimate",
+      "family": "New finance contact",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-3-0",
+      "label": "legitimate",
+      "family": "Bank merger",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-3-1",
+      "label": "legitimate",
+      "family": "Bank merger",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-3-2",
+      "label": "legitimate",
+      "family": "Bank merger",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-3-3",
+      "label": "legitimate",
+      "family": "Bank merger",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-3-4",
+      "label": "legitimate",
+      "family": "Bank merger",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-4-0",
+      "label": "legitimate",
+      "family": "New account",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-4-1",
+      "label": "legitimate",
+      "family": "New account",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-4-2",
+      "label": "legitimate",
+      "family": "New account",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-4-3",
+      "label": "legitimate",
+      "family": "New account",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-4-4",
+      "label": "legitimate",
+      "family": "New account",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-5-0",
+      "label": "legitimate",
+      "family": "Thread continuation",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-5-1",
+      "label": "legitimate",
+      "family": "Thread continuation",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-5-2",
+      "label": "legitimate",
+      "family": "Thread continuation",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-5-3",
+      "label": "legitimate",
+      "family": "Thread continuation",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-5-4",
+      "label": "legitimate",
+      "family": "Thread continuation",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-6-0",
+      "label": "legitimate",
+      "family": "New reply address",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-6-1",
+      "label": "legitimate",
+      "family": "New reply address",
+      "split": "development",
+      "score": 30,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-6-2",
+      "label": "legitimate",
+      "family": "New reply address",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-6-3",
+      "label": "legitimate",
+      "family": "New reply address",
+      "split": "held-out",
+      "score": 30,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-6-4",
+      "label": "legitimate",
+      "family": "New reply address",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-7-0",
+      "label": "legitimate",
+      "family": "Cross-border expansion",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-7-1",
+      "label": "legitimate",
+      "family": "Cross-border expansion",
+      "split": "development",
+      "score": 35,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-7-2",
+      "label": "legitimate",
+      "family": "Cross-border expansion",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-7-3",
+      "label": "legitimate",
+      "family": "Cross-border expansion",
+      "split": "held-out",
+      "score": 35,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-7-4",
+      "label": "legitimate",
+      "family": "Cross-border expansion",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-8-0",
+      "label": "legitimate",
+      "family": "Incomplete headers",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-8-1",
+      "label": "legitimate",
+      "family": "Incomplete headers",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-8-2",
+      "label": "legitimate",
+      "family": "Incomplete headers",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-8-3",
+      "label": "legitimate",
+      "family": "Incomplete headers",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-8-4",
+      "label": "legitimate",
+      "family": "Incomplete headers",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-9-0",
+      "label": "legitimate",
+      "family": "Incomplete bank fields",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-9-1",
+      "label": "legitimate",
+      "family": "Incomplete bank fields",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-9-2",
+      "label": "legitimate",
+      "family": "Incomplete bank fields",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-9-3",
+      "label": "legitimate",
+      "family": "Incomplete bank fields",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "legitimate-9-4",
+      "label": "legitimate",
+      "family": "Incomplete bank fields",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-0-0",
+      "label": "fraud",
+      "family": "Lookalike domain",
+      "split": "development",
+      "score": 80,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-0-1",
+      "label": "fraud",
+      "family": "Lookalike domain",
+      "split": "development",
+      "score": 100,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-0-2",
+      "label": "fraud",
+      "family": "Lookalike domain",
+      "split": "held-out",
+      "score": 80,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-0-3",
+      "label": "fraud",
+      "family": "Lookalike domain",
+      "split": "held-out",
+      "score": 100,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-0-4",
+      "label": "fraud",
+      "family": "Lookalike domain",
+      "split": "held-out",
+      "score": 80,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-1-0",
+      "label": "fraud",
+      "family": "Spoofed sender",
+      "split": "development",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-1-1",
+      "label": "fraud",
+      "family": "Spoofed sender",
+      "split": "development",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-1-2",
+      "label": "fraud",
+      "family": "Spoofed sender",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-1-3",
+      "label": "fraud",
+      "family": "Spoofed sender",
+      "split": "held-out",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-1-4",
+      "label": "fraud",
+      "family": "Spoofed sender",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-2-0",
+      "label": "fraud",
+      "family": "Reply-to diversion",
+      "split": "development",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-2-1",
+      "label": "fraud",
+      "family": "Reply-to diversion",
+      "split": "development",
+      "score": 85,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-2-2",
+      "label": "fraud",
+      "family": "Reply-to diversion",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-2-3",
+      "label": "fraud",
+      "family": "Reply-to diversion",
+      "split": "held-out",
+      "score": 85,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-2-4",
+      "label": "fraud",
+      "family": "Reply-to diversion",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-3-0",
+      "label": "fraud",
+      "family": "Foreign account diversion",
+      "split": "development",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-3-1",
+      "label": "fraud",
+      "family": "Foreign account diversion",
+      "split": "development",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-3-2",
+      "label": "fraud",
+      "family": "Foreign account diversion",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-3-3",
+      "label": "fraud",
+      "family": "Foreign account diversion",
+      "split": "held-out",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-3-4",
+      "label": "fraud",
+      "family": "Foreign account diversion",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-4-0",
+      "label": "fraud",
+      "family": "Compromised thread",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-4-1",
+      "label": "fraud",
+      "family": "Compromised thread",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-4-2",
+      "label": "fraud",
+      "family": "Compromised thread",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-4-3",
+      "label": "fraud",
+      "family": "Compromised thread",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-4-4",
+      "label": "fraud",
+      "family": "Compromised thread",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-5-0",
+      "label": "fraud",
+      "family": "Authentication failure",
+      "split": "development",
+      "score": 40,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-5-1",
+      "label": "fraud",
+      "family": "Authentication failure",
+      "split": "development",
+      "score": 50,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-5-2",
+      "label": "fraud",
+      "family": "Authentication failure",
+      "split": "held-out",
+      "score": 40,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-5-3",
+      "label": "fraud",
+      "family": "Authentication failure",
+      "split": "held-out",
+      "score": 50,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-5-4",
+      "label": "fraud",
+      "family": "Authentication failure",
+      "split": "held-out",
+      "score": 40,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-6-0",
+      "label": "fraud",
+      "family": "Executive pressure",
+      "split": "development",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-6-1",
+      "label": "fraud",
+      "family": "Executive pressure",
+      "split": "development",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-6-2",
+      "label": "fraud",
+      "family": "Executive pressure",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-6-3",
+      "label": "fraud",
+      "family": "Executive pressure",
+      "split": "held-out",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-6-4",
+      "label": "fraud",
+      "family": "Executive pressure",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-7-0",
+      "label": "fraud",
+      "family": "Subdomain trick",
+      "split": "development",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-7-1",
+      "label": "fraud",
+      "family": "Subdomain trick",
+      "split": "development",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-7-2",
+      "label": "fraud",
+      "family": "Subdomain trick",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-7-3",
+      "label": "fraud",
+      "family": "Subdomain trick",
+      "split": "held-out",
+      "score": 70,
+      "risk": "high"
+    },
+    {
+      "id": "fraud-7-4",
+      "label": "fraud",
+      "family": "Subdomain trick",
+      "split": "held-out",
+      "score": 60,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-8-0",
+      "label": "fraud",
+      "family": "Invalid routing",
+      "split": "development",
+      "score": 30,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-8-1",
+      "label": "fraud",
+      "family": "Invalid routing",
+      "split": "development",
+      "score": 40,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-8-2",
+      "label": "fraud",
+      "family": "Invalid routing",
+      "split": "held-out",
+      "score": 30,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-8-3",
+      "label": "fraud",
+      "family": "Invalid routing",
+      "split": "held-out",
+      "score": 40,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-8-4",
+      "label": "fraud",
+      "family": "Invalid routing",
+      "split": "held-out",
+      "score": 30,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-9-0",
+      "label": "fraud",
+      "family": "Quiet account takeover",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-9-1",
+      "label": "fraud",
+      "family": "Quiet account takeover",
+      "split": "development",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-9-2",
+      "label": "fraud",
+      "family": "Quiet account takeover",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-9-3",
+      "label": "fraud",
+      "family": "Quiet account takeover",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    },
+    {
+      "id": "fraud-9-4",
+      "label": "fraud",
+      "family": "Quiet account takeover",
+      "split": "held-out",
+      "score": 25,
+      "risk": "medium"
+    }
+  ]
+}
